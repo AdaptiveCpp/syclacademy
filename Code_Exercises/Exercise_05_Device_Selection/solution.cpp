@@ -19,14 +19,14 @@
 
 class scalar_add;
 
-// Example device selector, looks for an Intel GPU, you may want to write a
+// Example device selector, looks for an AMD GPU, you may want to write a
 // different device selector for the device you are looking for on your machine.
-class intel_gpu_selector : public sycl::device_selector {
+class amd_gpu_selector : public sycl::device_selector {
  public:
   int operator()(const sycl::device& dev) const override {
     if (dev.has(sycl::aspect::gpu)) {
       auto vendorName = dev.get_info<sycl::info::device::vendor>();
-      if (vendorName.find("Intel") != std::string::npos) {
+      if (vendorName.find("AMD") != std::string::npos) {
         return 1;
       }
     }
@@ -34,7 +34,7 @@ class intel_gpu_selector : public sycl::device_selector {
   }
 };
 
-TEST_CASE("intel_gpu_device_selector", "device_selectors_solution") {
+TEST_CASE("amd_gpu_device_selector", "device_selectors_solution") {
   int a = 18, b = 24, r = 0;
 
   try {
@@ -44,7 +44,7 @@ TEST_CASE("intel_gpu_device_selector", "device_selectors_solution") {
       }
     };
 
-    auto defaultQueue = sycl::queue{intel_gpu_selector{}, asyncHandler};
+    auto defaultQueue = sycl::queue{amd_gpu_selector{}, asyncHandler};
 
     std::cout << "Chosen device: "
               << defaultQueue.get_device().get_info<sycl::info::device::name>()

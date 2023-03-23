@@ -11,7 +11,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-TEST_CASE("intel_gpu_device_selector", "device_selectors_solution") {
+TEST_CASE("amd_gpu_device_selector", "device_selectors_solution") {
   int a = 18, b = 24, r = 0;
 
   try {
@@ -22,7 +22,7 @@ TEST_CASE("intel_gpu_device_selector", "device_selectors_solution") {
     };
 
 
-    // Task: add a device selector to create this queue with an Intel GPU
+    // Task: add a device selector to create this queue with an AMD GPU
     auto defaultQueue = sycl::queue{asyncHandler};
 
     {
