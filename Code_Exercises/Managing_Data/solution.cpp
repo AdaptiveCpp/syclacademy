@@ -12,10 +12,9 @@
 
 #include <sycl/sycl.hpp>
 
-class scalar_add_usm;
-class scalar_add_buff_acc;
+class scalar_add;
 
-void test_usm() {
+int main() {
   int a = 18, b = 24, r = 0;
 
   auto defaultQueue = sycl::queue {};
@@ -29,8 +28,7 @@ void test_usm() {
 
   defaultQueue
       .submit([&](sycl::handler& cgh) {
-        cgh.single_task<scalar_add_usm>(
-            [=] { dev_R[0] = dev_A[0] + dev_B[0]; });
+        cgh.single_task<scalar_add>([=] { dev_R[0] = dev_A[0] + dev_B[0]; });
       })
       .wait();
 
@@ -41,34 +39,4 @@ void test_usm() {
   sycl::free(dev_R, defaultQueue);
 
   SYCLACADEMY_ASSERT(r == 42);
-}
-
-void test_buffer() {
-  int a = 18, b = 24, r = 0;
-
-  auto defaultQueue = sycl::queue {};
-
-  {
-    auto bufA = sycl::buffer { &a, sycl::range { 1 } };
-    auto bufB = sycl::buffer { &b, sycl::range { 1 } };
-    auto bufR = sycl::buffer { &r, sycl::range { 1 } };
-
-    defaultQueue
-        .submit([&](sycl::handler& cgh) {
-          auto accA = sycl::accessor { bufA, cgh, sycl::read_only };
-          auto accB = sycl::accessor { bufB, cgh, sycl::read_only };
-          auto accR = sycl::accessor { bufR, cgh, sycl::write_only };
-
-          cgh.single_task<scalar_add_buff_acc>(
-              [=] { accR[0] = accA[0] + accB[0]; });
-        })
-        .wait();
-  }
-
-  SYCLACADEMY_ASSERT(r == 42);
-}
-
-int main() {
-  test_usm();
-  test_buffer();
 }
