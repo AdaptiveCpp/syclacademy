@@ -11,4 +11,7 @@
 // Task: Include SYCL header file
 
 // The below tests that the header file has been included
-int main() {}
+int main() {
+  sycl::queue q;
+  return 0;
+}

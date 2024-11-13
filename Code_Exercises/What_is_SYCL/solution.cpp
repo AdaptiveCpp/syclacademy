@@ -12,4 +12,7 @@
 #include <sycl/sycl.hpp>
 
 // The below tests that the header file has been included
-int main() { SYCLACADEMY_ASSERT(true); }
+int main() {
+  sycl::queue q;
+  return 0;
+}
