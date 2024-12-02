@@ -18,16 +18,7 @@ int main() {
 
   auto defaultQueue = sycl::queue {};
 
-  auto buf = sycl::buffer<int>(sycl::range { 1 });
-
-  defaultQueue
-      .submit([&](sycl::handler& cgh) {
-        // This throws an exception: an accessor has a range which is
-        // outside the bounds of its buffer.
-        auto acc = buf.get_access(cgh, sycl::range { 2 }, sycl::read_write);
-      })
-      .wait();
-
+  defaultQueue.parallel_for(sycl::range<1> { 0 }, [=](sycl::id<1> idx) {}).wait();
   defaultQueue.throw_asynchronous();
 
   SYCLACADEMY_ASSERT(true);

@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,6 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section>
@@ -136,13 +138,11 @@
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
-<mark>gpuQueue.submit([&](handler &cgh){</mark>
+							<pre class="cpp"><code data-line-numbers="1,5">gpuQueue.submit([&](handler &cgh){
   
   /* Command group function */
   
-<mark>});</mark>
-							</code></pre>
+});</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 							* The `submit` member function takes a C++ function object, which takes a reference to a `handler`.
@@ -158,7 +158,7 @@
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 <mark>gpuQueue.submit([&](handler &cgh){</mark>
   
   /* Command group function */
@@ -180,7 +180,7 @@
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 gpuQueue.submit([&](handler &cgh){
 
   /* Command group function */
@@ -232,7 +232,7 @@ gpuQueue.submit([&](handler &cgh){
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 class my_kernel;
 
 gpuQueue.submit([&](handler &cgh){
@@ -255,7 +255,7 @@ gpuQueue.submit([&](handler &cgh){
 				<section>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 class my_kernel;
 
 gpuQueue.submit([&](handler &cgh){
@@ -277,7 +277,7 @@ gpuQueue.submit([&](handler &cgh){
 				<section>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 class my_kernel;
 
 gpuQueue.submit([&](handler &cgh){
@@ -299,7 +299,7 @@ gpuQueue.submit([&](handler &cgh){
 				<section>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 <mark>class my_kernel;</mark>
 
 gpuQueue.submit([&](handler &cgh){
@@ -348,7 +348,7 @@ gpuQueue.submit([&](handler &cgh){
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 class my_kernel;
 
 queue gpuQueue;
@@ -372,7 +372,7 @@ gpuQueue.submit([&](handler &cgh){
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 struct my_kernel { 
   void operator()(){ 
     /* kernel function */
@@ -393,14 +393,14 @@ struct my_kernel {
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 struct my_kernel { 
   void operator()(){ 
     /* kernel function */
   }
 };
 							</code></pre>
-							<code><pre>
+							<pre class="cpp"><code>
 queue gpuQueue;
 gpuQueue.submit([&](handler &cgh){
 								
@@ -449,7 +449,7 @@ sycl::stream(size_t bufferSize, size_t workItemBufferSize, handler &cgh);
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
+							<pre class="cpp"><code>
 class my_kernel;
 
 queue gpuQueue;
@@ -476,8 +476,7 @@ gpuQueue.submit([&](handler &cgh){
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
-class my_kernel;
+							<pre class="cpp"><code>class my_kernel;
 
 queue gpuQueue;
 gpuQueue.submit([&](handler &cgh){
@@ -522,7 +521,9 @@ gpuQueue.submit([&](handler &cgh){
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true,
+				dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true}]
+			});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>
