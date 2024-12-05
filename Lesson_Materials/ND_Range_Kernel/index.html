@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,7 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
-					<img src="../common-revealjs/images/codeplay.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox" data-markdown>
@@ -283,121 +284,33 @@
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
-							
-cgh.parallel_for&ltkernel&gt(<mark>range&lt1&gt(1024)</mark>, 
-  [=](<mark>id&lt1&gt idx</mark>){
+							<pre class="cpp" style="margin-top:0;"><code data-line-numbers="2,3">cgh.parallel_for(
+  range&lt1&gt(1024),
+  [=](id&lt1&gt idx){
     /* kernel function code */
 });
 							</code></pre>
-							<code><pre>
-							
-cgh.parallel_for&ltkernel&gt(<mark>range&lt1&gt(1024)</mark>, 
-  [=](<mark>item&lt1&gt item</mark>){
+							<pre class="cpp" style="margin-bottom:13%;margin-top:13%;"><code data-line-numbers="2,3">cgh.parallel_for(
+  range&lt1&gt(1024),
+  [=](item&lt1&gt item){
     /* kernel function code */
-});
-							</code></pre>
-							<code><pre>
-							
-cgh.parallel_for&ltkernel&gt(nd_range&lt1&gt(<mark>range&lt1&gt(1024), 
-  range&lt1&gt(32))</mark>,[=](<mark>nd_item&lt1&gt ndItem</mark>){
+});</code></pre>
+							<pre class="cpp" style="margin-bottom:0;"><code data-line-numbers="2-4">q.parallel_for(
+  nd_range&lt1&gt(
+	range&lt1&gt(1024), range&lt1&gt(32)),
+  [=](nd_item&lt1&gt ndItem){
     /* kernel function code */
-});
-							</code></pre>
+});</code></pre>
 						</div>
 						<div class="col" data-markdown>
-							* Overload taking a **range** object specifies the global range, runtime decides local range
+							* Embarrassingly parallel overload taking a **range** object for the global range, runtime decides local range
 							* An **id** parameter represents the index within the global range
 							____________________________________________________________________________________________
-							* Overload taking a **range** object specifies the global range, runtime decides local range
-							* An **item** parameter represents the global range and the index within the global range
+							* Embarrassingly parallel overload taking a **range** object for the global range, runtime decides local range
+							* An **item** parameter represents the global range & index in the global range
 							____________________________________________________________________________________________
 							* Overload taking an **nd_range** object specifies the global and local range
 							* An **nd_item** parameter represents the global and local range and index
-						</div>
-					</div>
-				</section>
-				<!--Slide 22-->
-				<section>
-					<div class="hbox" data-markdown>
-						#### Accessing Data With Accessors
-					</div>
-					<div class="container" data-markdown>
-					* There are a few different ways to access the data represented by an accessor
-					  *  The subscript operator can take an **id**
-					    * Must be the same dimensionality of the accessor
-					    * For dimensions > 1, linear address is calculated in row major 
-					* Nested subscript operators can be called for each dimension taking a **size_t**
-					  * E.g. a 3-dimensional accessor: acc[x][y][z] = …
-					* A pointer to memory can be retrieved by calling **get_pointer**
-					  * This returns a raw pointer to the data
-					</div>
-				</section>
-				<!--Slide 23-->
-				<section>
-					<div class="hbox" data-markdown>
-						#### Accessing Data With Accessors
-					</div>
-					<div class="container">
-						<div class="col-left-3">
-							<code><pre>
-buffer&ltfloat, 1&gt bufA(dA.data(), range&lt1&gt(dA.size())); 
-buffer&ltfloat, 1&gt bufB(dB.data(), range&lt1&gt(dB.size())); 
-buffer&ltfloat, 1&gt bufO(dO.data(), range&lt1&gt(dO.size()));
-
-gpuQueue.submit([&](handler &cgh){
-  sycl::accessor inA{bufA, cgh, sycl::read_only};
-  sycl::accessor inB{bufB, cgh, sycl::read_only};
-  sycl::accessor out{bufO, cgh, sycl::write_only};
-  cgh.parallel_for&ltadd&gt(range&lt1&gt(dA.size()), 
-    [=](id&lt1&gt i){ 
-    <mark>out[i] = inA[i] + inB[i];</mark>
-  });
-});
-							</code></pre>
-						</div>
-						<div class="col-right-2" data-markdown>
-							* Here we access the data of the `accessor` by
-							passing in the `id` passed to the SYCL kernel
-							function.
-						</div>
-					</div>
-				</section>
-				<!--Slide 24-->
-				<section>
-					<div class="hbox" data-markdown>
-						#### Accessing Data With Accessors
-					</div>
-					<div class="container">
-						<div class="col-left-3">
-							<code><pre>
-buffer&ltfloat, 1&gt bufA(dA.data(), range&lt1&gt(dA.size())); 
-buffer&ltfloat, 1&gt bufB(dB.data(), range&lt1&gt(dB.size())); 
-buffer&ltfloat, 1&gt bufO(dO.data(), range&lt1&gt(dO.size()));
-
-gpuQueue.submit([&](handler &cgh){
-  sycl::accessor inA{bufA, cgh, sycl::read_only};
-  sycl::accessor inB{bufB, cgh, sycl::read_only};
-  sycl::accessor out{bufO, cgh, sycl::write_only};
-  cgh.parallel_for&ltadd&gt(rng, [=](item&lt3&gt i){
-    <mark>auto ptrA = inA.get_pointer();</mark>
-    <mark>auto ptrB = inB.get_pointer();</mark>
-    <mark>auto ptrO = out.get_pointer();</mark>
-    <mark>auto linearId = i.get_linear_id();</mark>
-
-    <mark>ptrA[linearId] = ptrB[linearId] + ptrO[linearId]; </mark>
-  });
-});
-							</code></pre>
-						</div>
-						<div class="col-right-2" data-markdown>
-							* Here we retrieve the underlying pointer for each
-							of the `accessor`s.
-							* We then access the pointer using the linearized
-							`id` by calling the `get_linear_id` member function
-							on the `item`.
-							* Again this linearization is calculated in
-							row-major order.
 						</div>
 					</div>
 				</section>
@@ -424,7 +337,7 @@ gpuQueue.submit([&](handler &cgh){
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-	Reveal.initialize();
+	Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 	Reveal.configure({ slideNumber: true });
 		</script>
 	</body>

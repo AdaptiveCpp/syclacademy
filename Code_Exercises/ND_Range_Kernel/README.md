@@ -12,13 +12,7 @@ In this exercise you will learn how to enqueue ND range kernel functions.
 Using the application from any exercise so far or creating a new one, enqueue a
 kernel function using the `parallel_for` variant which takes a `range` but has
 the kernel function take an `item`.
-
-Feel free to use either the buffer/accessor model and feel free to use any
-method of synchronization and copy back.
-
-When using an `item` you cannot pass this directly to the subscript operator of
-an `accessor` you have to retrieve the `id`, you can do this by calling the
-`get_id` member function.
+To get the item index to use to index pointers, use `itm.get_linear_id()`.
 
 ### 2.) Enqueue an ND range kernel
 
@@ -32,12 +26,9 @@ range and the second being the local range or the work-group size.
 Remember that when using this variant of `parallel_for` the kernel function
 takes an `nd_item`.
 
-Similarly to to the `item` when using the `nd_item` you cannot pass this
-directly to the subscript operator of an `accessor`, you can retrieve the `id`
-by calling the `get_global_id` member function.
-
-Feel free to use either the buffer/accessor model and feel free to use any
-method of synchronization and copy back.
+Similarly to the `item` when using the `nd_item` you cannot pass this
+directly to the subscript operator of a `pointer`, you can retrieve the linear
+index by calling the `get_global_linear_id` member function.
 
 ## Build and execution hints
 

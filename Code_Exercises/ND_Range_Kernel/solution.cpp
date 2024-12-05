@@ -12,9 +12,6 @@
 
 #include <sycl/sycl.hpp>
 
-class vector_add_1;
-class vector_add_2;
-
 void test_item() {
   constexpr size_t dataSize = 1024;
 
@@ -28,21 +25,20 @@ void test_item() {
   try {
     auto gpuQueue = sycl::queue { sycl::gpu_selector_v };
 
-    auto bufA = sycl::buffer { a, sycl::range { dataSize } };
-    auto bufB = sycl::buffer { b, sycl::range { dataSize } };
-    auto bufR = sycl::buffer { r, sycl::range { dataSize } };
+    auto A = sycl::malloc_device<int>(dataSize, gpuQueue);
+    auto B = sycl::malloc_device<int>(dataSize, gpuQueue);
+    auto R = sycl::malloc_device<int>(dataSize, gpuQueue);
 
-    gpuQueue.submit([&](sycl::handler& cgh) {
-      sycl::accessor accA { bufA, cgh, sycl::read_only };
-      sycl::accessor accB { bufB, cgh, sycl::read_only };
-      sycl::accessor accR { bufR, cgh, sycl::write_only };
+    gpuQueue.memcpy(A, a, dataSize * sizeof(int)).wait();
+    gpuQueue.memcpy(B, b, dataSize * sizeof(int)).wait();
 
-      cgh.parallel_for<vector_add_1>(
+    gpuQueue.parallel_for(
           sycl::range { dataSize }, [=](sycl::item<1> itm) {
-            auto globalId = itm.get_id();
-            accR[globalId] = accA[globalId] + accB[globalId];
-          });
-    });
+            auto globalId = itm.get_linear_id();
+            R[globalId] = A[globalId] + B[globalId];
+          }).wait();
+
+    gpuQueue.memcpy(r, R, dataSize * sizeof(int)).wait();
 
     gpuQueue.throw_asynchronous();
   } catch (const sycl::exception& e) {
@@ -68,25 +64,26 @@ void test_nd_item() {
   try {
     auto gpuQueue = sycl::queue { sycl::gpu_selector_v };
 
-    auto bufA = sycl::buffer { a, sycl::range { dataSize } };
-    auto bufB = sycl::buffer { b, sycl::range { dataSize } };
-    auto bufR = sycl::buffer { r, sycl::range { dataSize } };
+    auto A = sycl::malloc_device<int>(dataSize, gpuQueue);
+    auto B = sycl::malloc_device<int>(dataSize, gpuQueue);
+    auto R = sycl::malloc_device<int>(dataSize, gpuQueue);
 
-    gpuQueue.submit([&](sycl::handler& cgh) {
-      sycl::accessor accA { bufA, cgh, sycl::read_write };
-      sycl::accessor accB { bufB, cgh, sycl::read_write };
-      sycl::accessor accR { bufR, cgh, sycl::read_write };
+    gpuQueue.memcpy(A, a, dataSize * sizeof(int)).wait();
+    gpuQueue.memcpy(B, b, dataSize * sizeof(int)).wait();
 
-      auto ndRange = sycl::nd_range { sycl::range { dataSize },
-                                      sycl::range { workGroupSize } };
 
-      cgh.parallel_for<vector_add_2>(ndRange, [=](sycl::nd_item<1> itm) {
-        auto globalId = itm.get_global_id();
-        accR[globalId] = accA[globalId] + accB[globalId];
-      });
-    });
+    auto ndRange = sycl::nd_range { sycl::range { dataSize },
+                                    sycl::range { workGroupSize } };
+    gpuQueue.parallel_for(
+                  ndRange, [=](sycl::nd_item<1> itm) {
+            auto globalId = itm.get_global_linear_id();
+            R[globalId] = A[globalId] + B[globalId];
+          }).wait();
+
+    gpuQueue.memcpy(r, R, dataSize * sizeof(int)).wait();
 
     gpuQueue.throw_asynchronous();
+
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
