@@ -10,10 +10,9 @@
  * SYCL Quick Reference
  * ~~~~~~~~~~~~~~~~~~~~
  *
- * // Make a child class of sycl::device_selector
- * class my_functor_selector : public sycl::device_selector {
- *   // Overload operator() for sycl::device.
- *   int operator()(const sycl::device& dev) const override {
+ * // Make a functor to select a device
+ * class my_functor_selector {
+ *   int operator()(const sycl::device& dev) const {
  *   ...
  *   }
  * }
@@ -45,37 +44,35 @@
  * std::string dev_name = dev.get_info<sycl::info::device::name>();
  * std::string dev_driver_ver =
  dev.get_info<sycl::info::device::driver_version>();
- *
+ * int bits = dev.get_info<sycl::info::device::address_bits>();
+ * 
  *
 */
 
 #include "../helpers.hpp"
 #include <sycl/sycl.hpp>
 
-class scalar_add;
-
 int main() {
   int a = 18, b = 24, r = 0;
 
   try {
-    // Task: add a device selector to create this queue with an Intel GPU
+    // Task: add a device selector to create this queue with a GPU that has 64-bit addresses
     auto defaultQueue = sycl::queue {};
 
-    {
-      auto bufA = sycl::buffer { &a, sycl::range { 1 } };
-      auto bufB = sycl::buffer { &b, sycl::range { 1 } };
-      auto bufR = sycl::buffer { &r, sycl::range { 1 } };
+    int* A = sycl::malloc_device<int>(1, defaultQueue);
+    int* B = sycl::malloc_device<int>(1, defaultQueue);
+    int* R = sycl::malloc_device<int>(1, defaultQueue);
 
-      defaultQueue
-          .submit([&](sycl::handler& cgh) {
-            auto accA = sycl::accessor { bufA, cgh, sycl::read_only };
-            auto accB = sycl::accessor { bufB, cgh, sycl::read_only };
-            auto accR = sycl::accessor { bufR, cgh, sycl::write_only };
+    defaultQueue.memcpy(A, &a, sizeof(int)).wait();
+    defaultQueue.memcpy(B, &b, sizeof(int)).wait();
 
-            cgh.single_task<scalar_add>([=]() { accR[0] = accA[0] + accB[0]; });
-          })
-          .wait();
-    }
+    defaultQueue.single_task([=]() { R[0] = A[0] + B[0]; }).wait();
+
+    defaultQueue.memcpy(&r, R, sizeof(int)).wait();
+
+    sycl::free(A, defaultQueue);
+    sycl::free(B, defaultQueue);
+    sycl::free(R, defaultQueue);
 
     defaultQueue.throw_asynchronous();
   } catch (const sycl::exception& e) {

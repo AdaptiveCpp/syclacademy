@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,6 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox">
@@ -121,10 +123,7 @@
 					</div>
 					<div class="container">
 						<div class="col-left-1">
-							<code><pre>
-auto platforms = platform::get_platforms();
-
-							</code></pre>
+							<code><pre>auto platforms = platform::get_platforms();</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 						    ![SYCL](../common-revealjs/images/devices-5.png "SYCL-Devices")
@@ -142,10 +141,7 @@ auto platforms = platform::get_platforms();
 					</div>
 					<div class="container">
 						<div class="col-left-1">
-							<code><pre>
-auto intelDevices = intelPlatform.get_devices();
-
-							</code></pre>
+							<code><pre>auto intelDevices = intelPlatform.get_devices();</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 						    ![SYCL](../common-revealjs/images/devices-6.png "SYCL-Devices")
@@ -164,10 +160,7 @@ auto intelDevices = intelPlatform.get_devices();
 					</div>
 					<div class="container">
 						<div class="col-left-1">
-							<code><pre>
-auto devices = device::get_devices();
-
-							</code></pre>
+							<code><pre>auto devices = device::get_devices();</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 						    ![SYCL](../common-revealjs/images/devices-7.png "SYCL-Devices")
@@ -203,9 +196,7 @@ auto devices = device::get_devices();
 					</div>
 					<div class="container">
 						<div class="col-left-1">
-							<code><pre>
-auto gpuDevice = device(gpu_selector_v); 
-							</code></pre>
+							<code><pre>auto gpuDevice = device(gpu_selector_v);</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 						    ![Device Topology](../common-revealjs/images/topology-1.png "Device-Topology")
@@ -224,10 +215,8 @@ auto gpuDevice = device(gpu_selector_v);
 					</div>
 					<div class="container">
 						<div class="col-left-1">
-							<code><pre>
-auto chosenDevice = device();
-auto chosenDevice = device(default_selector_v);
-							</code></pre>
+							<code><pre>auto chosenDevice = device();
+auto chosenDevice = device(default_selector_v);</code></pre>
 						</div>
 						<div class="col-right-1" data-markdown>
 						    ![Device Topology](../common-revealjs/images/topology-1.png "Device-Topology")
@@ -245,11 +234,9 @@ auto chosenDevice = device(default_selector_v);
 						#### Creating a custom device selector
 					</div>
 					<div class="container">
-						<code><pre>
-<mark>int my_gpu_selector(const device& dev) {</mark>
+						<pre><code data-line-numbers="1,3">int my_gpu_selector(const device& dev) {
 
-<mark>}</mark>
-						</code></pre>
+}</code></pre>
 					</div>
 					<div class="hbox" data-markdown>
 						* A device selector can be any callable object.
@@ -262,16 +249,13 @@ auto chosenDevice = device(default_selector_v);
 						#### Creating a custom device selector
 					</div>
 					<div class="container">
-						<code><pre>
-int my_gpu_selector(const device& dev) {
-  <mark>if (dev.is_gpu()){</mark>
-    <mark>return 1;</mark>
-  <mark>}</mark>
-  <mark>else {</mark>
-    <mark>return -1;</mark>
-  <mark>}</mark>
-}
-						</code></pre>
+						<pre><code data-line-numbers="2-6">int my_gpu_selector(const device& dev) {
+  if (dev.is_gpu()) {
+    return 1;
+  } else {
+    return -1;
+  }
+}</code></pre>
 					</div>
 					<div class="hbox" data-markdown>
 						* The body of the function call operator defines the heuristic for selecting devices
@@ -284,21 +268,18 @@ int my_gpu_selector(const device& dev) {
 						#### Creating a custom device selector
 					</div>
 					<div class="container">
-						<code><pre>
-int my_gpu_selector(const device& dev) {
-  if (dev.is_gpu()){
+						<pre><code data-line-numbers="10">int my_gpu_selector(const device& dev) {
+  if (dev.is_gpu()) {
     return 1;
-  }
-  else {
+  } else {
     return -1;
   }
 }
 
 int main(int argc, char *argv[]) {
-  <mark>auto gpuQueue = queue{my_gpu_selector};</mark>
+  auto gpuQueue = queue{my_gpu_selector};
 
-}
-						</code></pre>
+}</code></pre>
 					</div>
 					<div class="hbox" data-markdown>
 						* Now that there is a device selector that chooses a specific device we can use that to construct a queue.
@@ -310,12 +291,10 @@ int main(int argc, char *argv[]) {
 						#### Platform/device info
 					</div>
 					<div class="container">
-						<div class="col-left-1">
-							<code><pre>
-auto plt = dev.get_platform();
+						<div class="col-left-1" style="flex-basis: 15%;">
+							<pre><code>auto plt = dev.get_platform();
 auto platformName
-  = dev.get_info&lt;info::device::name&gt;();
-							</code></pre>
+  = dev.get_info&lt;info::device::name&gt;();</code></pre>
 						</div>
 						<div class="col-right-2" data-markdown>
 						    ![SYCL](../common-revealjs/images/topology-2.png "SYCL-Devices")
@@ -334,9 +313,7 @@ auto platformName
 					</div>
 					<div class="container">
 						<div class="col">
-							<code><pre>
-bool supportsFp16 = dev.has(aspect::fp16);
-							</code></pre>
+							<pre><code>bool supportsFp16 = dev.has(aspect::fp16);</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* Capabilities of a device or platform are
@@ -371,7 +348,8 @@ bool supportsFp16 = dev.has(aspect::fp16);
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
+
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>
