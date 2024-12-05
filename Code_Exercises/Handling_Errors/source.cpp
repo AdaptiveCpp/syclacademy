@@ -12,14 +12,31 @@
 
 #include <sycl/sycl.hpp>
 
+void synchronous_error() {
+  auto defaultQueue = sycl::queue { [](const sycl::device& d) { return -1; }};
+}
+
+void asynchronous_error() {
+  auto asyncHandler = [&](sycl::exception_list exceptionList) {
+    for (auto& e : exceptionList) {
+      std::rethrow_exception(e);
+    }
+  };
+
+  auto defaultQueue = sycl::queue { asyncHandler };
+
+  defaultQueue.memset((void*)NULL, 0, 1).wait();
+
+  defaultQueue.wait_and_throw();
+}
+
 int main() {
 
   // Task: catch synchronous and asynchronous exceptions
 
-  auto defaultQueue = sycl::queue {};
+  synchronous_error();
 
-  defaultQueue.parallel_for(sycl::range<1> { 0 }, [=](sycl::id<1> idx) {}).wait();
-  defaultQueue.throw_asynchronous();
+  asynchronous_error();
 
   SYCLACADEMY_ASSERT(true);
 }

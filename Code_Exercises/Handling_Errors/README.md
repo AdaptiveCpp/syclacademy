@@ -12,7 +12,7 @@ exceptions.
 ### 1.) Catch synchronous exception handling
 
 Synchronous errors, such as failure to construct an object, are reported
-immediately  by  the  runtime  throwing  an  exception.
+immediately by the runtime throwing an exception.
 
 To catch synchronous exceptions simply wrap your application in a try catch
 block and catch a SYCL `exception` and print out the error message provided by
@@ -20,7 +20,7 @@ the `what` member function.
 
 ### 2. ) Catch and asynchronous exceptions
 
-Asynchronous  errors, such  as  an  error  occurring  during execution of a
+Asynchronous errors, such as an error occurring during execution of a
 kernel on a device, are reported via user-supplied asynchronous error-handlers.
 
 To catch asynchronous exceptions create an async handler using a lambda
