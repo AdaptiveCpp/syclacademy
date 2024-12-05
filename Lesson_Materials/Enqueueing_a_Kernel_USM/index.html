@@ -196,28 +196,6 @@
 						* This allows sharing dependency information.
 					</div>
 				</section>
-				<!--Slide 15-->
-				<!-- <section>
-					<div class="container">
-						<div class="col">
-							<pre class="cpp"><code>
-<mark>class my_kernel;</mark>
-
-gpuQueue.submit([&](handler &cgh){
-								
-  cgh.single_task&lt;<mark>my_kernel</mark>&gt;([=]() {
-    /* kernel code */
-  }); 
-}).wait();
-							</code></pre>
-						</div>
-						<div class="col" data-markdown>
-							* The template parameter passed to `single_task` is used to name the kernel function.
-							* This is necessary when defining kernel functions with lambdas to allow the host and device compilers to communicate.
-							* SYCL 2020 allows kernel lambdas to be unnamed, but not all implementations support that yet.
-						</div>
-					</div>
-				</section> -->
 				<!--Slide 16-->
 				<section>
 					<div class="hbox" data-markdown>
@@ -226,8 +204,6 @@ gpuQueue.submit([&](handler &cgh){
 					<div class=container data-markdown>
 						* Must be defined using a C++ lambda or function object, they cannot be a function pointer or std::function.
 						* Must always capture or store members by-value.
-						<!-- * SYCL kernel functions declared with a lambda ~~must be named using a forward declarable C++ type, declared in global scope~~ can be anonymous since SYCL 2020! -->
-						<!-- * SYCL kernel function names follow C++ ODR rules, which means you cannot have two kernels with the same name. -->
 					</div>
 				</section>
 				<!--Slide 17-->
@@ -315,6 +291,8 @@ gpuQueue.single_task(my_kernel{}).wait();</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						Implement a SYCL application which enqueues a kernel function to a device and streams "Hello world!" to the console.
+
+						For now, use the AdaptiveCpp specific `sycl::detail::print` function to stream text to the console.
 					</div>
 				</section>
 			</div>
