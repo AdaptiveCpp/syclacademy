@@ -12,8 +12,6 @@
 
 #include <sycl/sycl.hpp>
 
-class scalar_add;
-
 int main() {
   int a = 18, b = 24, r = 0;
 
@@ -26,11 +24,11 @@ int main() {
   defaultQueue.memcpy(dev_A, &a, 1 * sizeof(int)).wait();
   defaultQueue.memcpy(dev_B, &b, 1 * sizeof(int)).wait();
 
-  defaultQueue
-      .submit([&](sycl::handler& cgh) {
-        cgh.single_task<scalar_add>([=] { dev_R[0] = dev_A[0] + dev_B[0]; });
-      })
-      .wait();
+  defaultQueue.single_task(
+      [=] {
+        dev_R[0] = dev_A[0] + dev_B[0];
+      }
+    ).wait();
 
   defaultQueue.memcpy(&r, dev_R, 1 * sizeof(int)).wait();
 

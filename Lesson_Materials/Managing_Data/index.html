@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,6 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox" data-markdown>
@@ -199,7 +201,7 @@
 						Each SYCL platform and its device(s) will support
 						different variants of USM and different kinds of memory allocation
 					</div>
-					<code><pre>if (dev.has(sycl::aspect::usm_device_allocations))</code></pre>
+					<pre><code>if (dev.has(sycl::aspect::usm_device_allocations))</code></pre>
 				</section>
 				<!--Slide 3-->
 				<section>
@@ -207,8 +209,7 @@
 						#### Using USM - Malloc Device
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-// Allocate memory on device
+						<pre class="cpp"><code class="code-100pc">// Allocate memory on device
 T *device_ptr = sycl::malloc_device&lt;T&gt;(n, myQueue);
 
 // Copy data to device
@@ -222,8 +223,7 @@ myQueue.memcpy(device_ptr, cpu_ptr, n * sizeof(T));
 myQueue.memcpy(result_ptr, device_ptr, n * sizeof(T)).wait();
 
 // Free allocated data
-sycl::free(device_ptr, myQueue);
-						</code></pre>
+sycl::free(device_ptr, myQueue);</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* It is important to free memory after it has been 
@@ -235,8 +235,7 @@ sycl::free(device_ptr, myQueue);
 						#### Using USM - Malloc Shared
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-// Allocate shared memory 
+						<pre class="cpp"><code class="code-100pc">// Allocate shared memory 
 T *shared_ptr = sycl::malloc_shared&lt;T&gt;(n, myQueue);
 
 // Shared memory can be accessed on host as well as device
@@ -248,8 +247,7 @@ for (auto i = 0; i &lt; n; ++i)
 // ...
 
 // Free allocated data
-sycl::free(shared_ptr, myQueue);
-						</code></pre>
+sycl::free(shared_ptr, myQueue);</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* Shared memory is accessible on host and device.
@@ -272,7 +270,8 @@ sycl::free(shared_ptr, myQueue);
 					</div>
 					<div class="container" data-markdown>
 						Implement a SYCL application that adds two variables
-						and returns the result. Use USM to manage memory.
+						and returns the result.  
+						Use USM to manage memory.
 					</div>
 				</section>
 			</div>
@@ -282,7 +281,9 @@ sycl::free(shared_ptr, myQueue);
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize();
+			Reveal.initialize({
+				dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true}]
+			});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>

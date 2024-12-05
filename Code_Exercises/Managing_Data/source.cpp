@@ -26,12 +26,10 @@
  * // Free memory
  * sycl::free(ptr, q);
  *
- * // Submit a kernel
- * q.submit([&](sycl::handler &cgh) {
- *    cgh.single_task([=](){
+ * // Submit a single task kernel
+ * q.single_task([=](){
  *      // Some kernel code
- *      });
- * }).wait();
+ *   }).wait();
  *
 */
 
