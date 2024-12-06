@@ -13,9 +13,6 @@
  * // Default construct a queue
  * auto q = sycl::queue{};
  *
- * // Declare a buffer pointing to ptr
- * auto buf = sycl::buffer{ptr, sycl::range{n}};
- *
  * // Do a USM memcpy
  * auto event = q.memcpy(dst_ptr, src_ptr, sizeof(T)*n);
  * // Do a USM memcpy with dependent events
@@ -26,30 +23,18 @@
  *
  * // Wait on a queue
  * q.wait();
+ * 
+ * // Enqueue a parallel for:
+ * // i: Without dependent events
+ *        q.parallel_for(sycl::range{n},
+ *        [=](sycl::id<1> i) { // Do something });
+ * // ii: With dependent events
+ *        q.parallel_for(sycl::range{n},
+ *        {event1, event2}, [=](sycl::id<1> i) {
+ *            // Do something
+ *          });
  *
- * // Submit work to the queue
- * auto event = q.submit([&](sycl::handler &cgh) {
- *   // COMMAND GROUP
- * });
- *
- *
- * // Within the command group you can
- * //    1. Declare an accessor to a buffer
- *          auto read_write_acc = sycl::accessor{buf, cgh};
- *          auto read_acc = sycl::accessor{buf, cgh, sycl::read_only};
- *          auto write_acc = sycl::accessor{buf, cgh, sycl::write_only};
- *          auto no_init_acc = sycl::accessor{buf, cgh, sycl::no_init};
- * //    2. Enqueue a parallel for:
- * //             i: Without dependent events
- *                    cgh.parallel_for<class mykernel>(sycl::range{n},
- *                    [=](sycl::id<1> i) { // Do something });
- * //             ii: With dependent events
- *                    cgh.parallel_for<class mykernel>(sycl::range{n},
- *                    {event1, event2}, [=](sycl::id<1> i) {
- *                        // Do something
- *                      });
- *
-*/
+ */
 
 #include "../helpers.hpp"
 

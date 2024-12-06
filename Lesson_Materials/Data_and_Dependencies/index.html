@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,6 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox">
@@ -61,11 +63,10 @@
 					## Learning Objectives
 					* Learn about how to create dependencies between kernel functions
 					* Learn about how to move data between the host and device(s)
-					* Learn about the differences between the buffer/accessor and USM data management models
 					* Learn how to represent basic data flow graphs
                 </section>
 				<!--Slide 3-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Access/buffer and USM
 					</div>
@@ -86,7 +87,7 @@
 							* Explicit data movement
 						</div>
 					</div>
-				</section>
+				</section> -->
 				<!--Slide 4-->
 				<section>
 					<div class="hbox" data-markdown>
@@ -138,35 +139,33 @@
 					</div>
 				</section>
 				<!--Slide 7-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Data flow with buffers and accessors
 					</div>
 					<div class="container">
 						<div class="col">
-							<code class="code-100pc"><pre>
-sycl::buffer buf {data, sycl::range{1024}};
+							<pre class="cpp"><code class="code-100pc">sycl::buffer buf {data, sycl::range{1024}};
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc {buf, cgh};
 
-  cgh.parallel_for&lt;kernel_a&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       acc[idx] = /* some computation */
     });
 });
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc{buf, cgh};
 
-  cgh.parallel_for&lt;kernel_b&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       acc[idx] = /* some computation */
     });
 });
 
-gpuQueue.wait();
-							</code></pre>
+q.wait();</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* The buffer/accessor data management model data model is descriptive
@@ -174,36 +173,35 @@ gpuQueue.wait();
 							* The SYCL runtime is responsible for guaranteeing that data dependencies and consistency are maintained
 						</div>
 					</div>
-				</section>
+				</section> -->
 				<!--Slide 8-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Data flow with buffers and accessors
 					</div>
 					<div class="container">
 						<div class="col">
-							<code class="code-100pc"><pre>
-<mark>sycl::buffer buf {data, sycl::range{1024}};</mark>
+							<pre class="cpp"><code class="code-100pc"><mark>sycl::buffer buf {data, sycl::range{1024}};</mark>
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc {buf, cgh};
 
-  cgh.parallel_for&lt;kernel_a&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       acc[idx] = /* some computation */
     });
 });
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc {buf, cgh};
 
-  cgh.parallel_for&lt;kernel_b&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       acc[idx] = /* some computation */
     });
 });
 
-gpuQueue.wait();
+q.wait();
 							</code></pre>
 						</div>
 						<div class="col" data-markdown>
@@ -213,18 +211,17 @@ gpuQueue.wait();
 							* Note that a `buffer` is lazy and will not allocate or move data until it is asked to
 						</div>
 					</div>
-				</section>
-				<!--Slide 9-->
-				<section>
+				</section> -->
+				<!-- Slide 9-->
+				<!--<section>
 					<div class="hbox" data-markdown>
 						#### Data flow with buffers and accessors
 					</div>
 					<div class="container">
 						<div class="col">
-							<code class="code-100pc"><pre>
-sycl::buffer buf {data, sycl::range{1024}};
+							<pre class="cpp"><code class="code-100pc">sycl::buffer buf {data, sycl::range{1024}};
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   <mark>sycl::accessor acc{buf, cgh};</mark>
 
   cgh.parallel_for&lt;my_kernel&gt;(sycl::range{1024},
@@ -233,7 +230,7 @@ gpuQueue.submit([&](sycl::handler &cgh) {
     });
 });
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   <mark>sycl::accessor acc{buf, cgh};</mark>
 
   cgh.parallel_for&lt;my_kernel&gt;(sycl::range{1024},
@@ -242,8 +239,7 @@ gpuQueue.submit([&](sycl::handler &cgh) {
     });
 });
 
-gpuQueue.wait();
-							</code></pre>
+q.wait();</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* An `accessor` object is responsible for describing data access requirements
@@ -251,18 +247,17 @@ gpuQueue.wait();
 							* The `buffer` object uses this information to create infer dependencies and data movement
 						</div>
 					</div>
-				</section>
+				</section>-->
 				<!--Slide 10-->
-				<section>
+				<!--<section>
 					<div class="hbox" data-markdown>
 						#### Data flow with buffers and accessors
 					</div>
 					<div class="container">
 						<div class="col">
-							<code class="code-100pc"><pre>
-buf = sycl::buffer(data, sycl::range{1024});
+							<pre class="cpp"><code class="code-100pc">sycl::buffer buf {data, sycl::range{1024}};
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc {buf, <mark>cgh</mark>};
 
   cgh.parallel_for&lt;my_kernel&gt;(sycl::range{1024},
@@ -271,7 +266,7 @@ gpuQueue.submit([&](sycl::handler &cgh) {
     });
 });
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   sycl::accessor acc {buf, <mark>cgh</mark>};
 
   cgh.parallel_for&lt;my_kernel&gt;(sycl::range{1024},
@@ -280,45 +275,41 @@ gpuQueue.submit([&](sycl::handler &cgh) {
     });
 });
 
-gpuQueue.wait();
-							</code></pre>
+q.wait();</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* Associating the `accessor` object with the `handler` connects the access dependency to the kernel function
 							* It also associates the access requirement with the device being targeted
 						</div>
 					</div>
-				</section>
+				</section> -->
 				<!--Slide 11-->
 				<section>
 					<div class="hbox" data-markdown>
 						#### Data flow with USM
 					</div>
 					<div class="container">
-						<div class="col">
-							<code class="code-100pc"><pre>
-auto devicePtr =
-  sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers>auto devPtr = sycl::malloc_device&lt;int&gt;(1024, q);
 
-auto e1 = gpuQueue.memcpy(devicePtr, data, sizeof(int));
-
-auto e2 = gpuQueue.parallel_for&lt;kernel_a&gt;(
-  sycl::range{1024}, e1, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.parallel_for(sycl::range{1024},
+  e1,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-auto e3 = gpuQueue.parallel_for&lt;kernel_b&gt;(
-  sycl::range{1024}, e2, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e3 = q.parallel_for(sycl::range{1024},
+  e2,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-auto e4 = gpuQueue.memcpy(data, devicePtr,
+auto e4 = q.memcpy(data, devPtr,
                           sizeof(int), e3);
-
 e4.wait();
 
-sycl::free(devicePtr, gpuQueue);
-							</code></pre>
+sycl::free(devPtr, q);</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* The USM data management model data model is prescriptive
@@ -334,28 +325,26 @@ sycl::free(devicePtr, gpuQueue);
 						#### Data flow with USM
 					</div>
 					<div class="container">
-						<div class="col">
-							<code class="code-100pc"><pre>
-auto devicePtr =
-  sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers="3-5,10-11,16-17">auto devPtr = sycl::malloc_device&lt;int&gt;(1024, q);
 
-<mark>auto e1</mark> = gpuQueue.memcpy(devicePtr, data, sizeof(int));
-
-<mark>auto e2</mark> = gpuQueue.parallel_for&lt;kernel_a&gt;(
-  sycl::range{1024}, <mark>e1</mark>, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.parallel_for(sycl::range{1024},
+  e1,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-<mark>auto e3</mark> = gpuQueue.parallel_for&lt;kernel_b&gt;(
-  sycl::range{1024}, <mark>e2</mark>, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e3 = q.parallel_for(sycl::range{1024},
+  e2,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-<mark>auto e4</mark> = gpuQueue.memcpy(data, devicePtr,
-                          sizeof(int), <mark>e3</mark>);
+auto e4 = q.memcpy(data, devPtr, sizeof(int), e3);
+e4.wait();
 
-<mark>e4.wait();</mark>
-							</code></pre>
+sycl::free(devPtr, q);</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* Each command enqueued to the `queue` produces an `event` object which can be used to synchronize with the completion of that command
@@ -369,30 +358,26 @@ auto devicePtr =
 						#### Data flow with USM
 					</div>
 					<div class="container">
-						<div class="col">
-							<code class="code-100pc"><pre>
-auto devicePtr =
-  sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers="3,16">auto devPtr = sycl::malloc_device&lt;int&gt;(1024, q);
 
-<mark>auto e1 = gpuQueue.memcpy(devicePtr, data, sizeof(int));</mark>
-
-auto e2 = gpuQueue.parallel_for&lt;kernel_a&gt;(
-  sycl::range{1024}, e1, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.parallel_for(sycl::range{1024},
+  e1,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-auto e3 = gpuQueue.parallel_for&lt;kernel_b&gt;(
-  sycl::range{1024}, e2, [=](sycl::id&lt;1&gt; idx) {
-    devicePtr[idx] = /* some computation */
+auto e3 = q.parallel_for(sycl::range{1024},
+  e2,
+  [=](sycl::id&lt;1&gt; idx) {
+    devPtr[idx] = /* some computation */
   });
 
-auto e4 = gpuQueue.memcpy(data, devicePtr,
-                          sizeof(int), e3);
-
+auto e4 = q.memcpy(data, devPtr, sizeof(int), e3);
 e4.wait();
 
-sycl::free(devicePtr, gpuQueue);
-							</code></pre>
+sycl::free(devPtr, q);</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* The `memcpy` member functions are used to enqueue data movement commands, moving the data to the GPU and then back again
@@ -417,36 +402,34 @@ sycl::free(devicePtr, gpuQueue);
 					</div>
 				</section>
 				<!--Slide 15-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Concurrent data flow with buffers and accessors
 					</div>
 					<div class="container">
 						<div class="col">
-							<code class="code-100pc"><pre>
-sycl::buffer bufA {dataA, sycl::range{1024}};
+							<pre class="cpp"><code class="code-100pc">sycl::buffer bufA {dataA, sycl::range{1024}};
 sycl::buffer bufB {dataB, sycl::range{1024}};
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   <mark>sycl::accessor accA {bufA, cgh};</mark>
 
-  cgh.parallel_for&lt;kernel_a&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       accA[idx] = /* some computation */
     });
 });
 
-gpuQueue.submit([&](sycl::handler &cgh) {
+q.submit([&](sycl::handler &cgh) {
   <mark>sycl::accessor accB {bufB, cgh};</mark>
 
-  cgh.parallel_for&lt;kernel_b&gt;(sycl::range{1024},
+  cgh.parallel_for(sycl::range{1024},
     [=](sycl::id&lt;1&gt; idx) {
       accB[idx] = /* some computation */
     });
 });
 
-gpuQueue.wait();
-							</code></pre>
+q.wait();</code></pre>
 						</div>
 						<div class="col" data-markdown>
 							* The buffer/accessor data management model automatically infers dependencies
@@ -455,35 +438,33 @@ gpuQueue.wait();
 							* The two kernels and their respective copies collectively can be executed in any order
 						</div>
 					</div>
-				</section>
+				</section> -->
 				<!--Slide 16-->
 				<section>
 					<div class="hbox" data-markdown>
 						#### Concurrent data flow with USM
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-auto devicePtrA = sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
-auto devicePtrB = sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
+						<pre class="cpp"><code class="code-100pc" data-line-numbers="4,7,13,16">auto devPtrA = sycl::malloc_device&lt;int&gt;(1024, q);
+auto devPtrB = sycl::malloc_device&lt;int&gt;(1024, q);
 
-<mark>auto e1</mark> = gpuQueue.memcpy(devicePtrA, dataA, sizeof(int));
-auto e2 = gpuQueue.memcpy(devicePtrB, dataB, sizeof(int));
+auto e1 = q.memcpy(devPtrA, dataA, sizeof(int));
+auto e2 = q.memcpy(devPtrB, dataB, sizeof(int));
 
-<mark>auto e3</mark> = gpuQueue.parallel_for&lt;kernel_a&gt;(sycl::range{1024}, <mark>e1</mark>, [=](sycl::id&lt;1&gt; idx) {
-  devicePtrA[idx] = /* some computation */ });
+auto e3 = q.parallel_for(sycl::range{1024}, e1,
+    [=](sycl::id&lt;1&gt; idx) { devPtrA[idx] = /* some computation */ });
 
-auto e4 = gpuQueue.parallel_for&lt;kernel_b&gt;(sycl::range{1024}, e2, [=](sycl::id&lt;1&gt; idx) {
-  devicePtrB[idx] = /* some computation */ });
+auto e4 = q.parallel_for(sycl::range{1024}, e2,
+	[=](sycl::id&lt;1&gt; idx) { devPtrB[idx] = /* some computation */ });
 
-<mark>auto e5</mark> = gpuQueue.memcpy(dataA), devicePtrA, sizeof(int), <mark>e3</mark>);
+auto e5 = q.memcpy(dataA, devPtrA, sizeof(int), e3);
+auto e6 = q.memcpy(dataB, devPtrB, sizeof(int), e4);
 
-auto e6 = gpuQueue.memcpy(dataB, devicePtrB, sizeof(int), e4);
+e5.wait();
+e6.wait();
 
-<mark>e5.wait();</mark> e6.wait();
-
-sycl::free(devicePtrA, gpuQueue);
-sycl::free(devicePtrB, gpuQueue);
-							</code></pre>
+sycl::free(devPtrA, q);
+sycl::free(devPtrB, q);</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* Dependencies are defined explicitly
@@ -496,28 +477,26 @@ sycl::free(devicePtrB, gpuQueue);
 						#### Concurrent data flow with USM
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-auto devicePtrA = sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
-auto devicePtrB = sycl::malloc_device&lt;int&gt;(1024, gpuQueue);
+						<pre class="cpp"><code class="code-100pc" data-line-numbers="5,10,14,17">auto devPtrA = sycl::malloc_device&lt;int&gt;(1024, q);
+auto devPtrB = sycl::malloc_device&lt;int&gt;(1024, q);
 
-auto e1 = gpuQueue.memcpy(devicePtrA, dataA, sizeof(int));
-<mark>auto e2</mark> = gpuQueue.memcpy(devicePtrB, dataB, sizeof(int));
+auto e1 = q.memcpy(devPtrA, dataA, sizeof(int));
+auto e2 = q.memcpy(devPtrB, dataB, sizeof(int));
 
-auto e3 = gpuQueue.parallel_for&lt;kernel_a&gt;(sycl::range{1024}, e1, [=](sycl::id&lt;1&gt; idx) {
-  devicePtrA[idx] = /* some computation */ });
+auto e3 = q.parallel_for(sycl::range{1024}, e1,
+    [=](sycl::id&lt;1&gt; idx) { devPtrA[idx] = /* some computation */ });
 
-<mark>auto e4</mark> = gpuQueue.parallel_for&lt;kernel_b&gt;(sycl::range{1024}, <mark>e2</mark>, [=](sycl::id&lt;1&gt; idx) {
-  devicePtrB[idx] = /* some computation */ });
+auto e4 = q.parallel_for(sycl::range{1024}, e2,
+	[=](sycl::id&lt;1&gt; idx) { devPtrB[idx] = /* some computation */ });
 
-auto e5 = gpuQueue.memcpy(dataA), devicePtrA, sizeof(int), e3);
+auto e5 = q.memcpy(dataA, devPtrA, sizeof(int), e3);
+auto e6 = q.memcpy(dataB, devPtrB, sizeof(int), e4);
 
-<mark>auto e6</mark> = gpuQueue.memcpy(dataB, devicePtrB, sizeof(int), <mark>e4</mark>);
+e5.wait();
+e6.wait();
 
-e5.wait(); <mark>e6.wait();</mark>
-
-sycl::free(devicePtrA, gpuQueue);
-sycl::free(devicePtrB, gpuQueue);
-							</code></pre>
+sycl::free(devPtrA, q);
+sycl::free(devPtrB, q);</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* The dependencies of each chain of commands is independant of the other
@@ -525,7 +504,7 @@ sycl::free(devicePtrB, gpuQueue);
 					</div>
 				</section>
 				<!--Slide 15-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Which should you choose?
 					</div>
@@ -546,7 +525,7 @@ sycl::free(devicePtrB, gpuQueue);
 							* If you want more fine grained control over data movement
 						</div>
 					</div>
-				</section>
+				</section> -->
 				<!--Slide 16-->
 				<section>
 					<div class="hbox" data-markdown>
@@ -565,7 +544,7 @@ sycl::free(devicePtrB, gpuQueue);
 						![SYCL](../common-revealjs/images/diamond_data_flow.png "SYCL")
 					</div>
 					<div class="container" data-markdown>
-						Put together what you've seen here to create the above diamond data flow graph in either buffer/accessor or USM data management models
+						Put together what you've seen here to create the above diamond data flow graph.
 					</div>
 				</section>
 			</div>
@@ -575,7 +554,7 @@ sycl::free(devicePtrB, gpuQueue);
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>
