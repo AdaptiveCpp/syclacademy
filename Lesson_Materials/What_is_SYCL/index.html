@@ -298,6 +298,21 @@
 						**IR** = Intermediate Representation 	**ISA** = Instruction Set Architecture
 					</div>
 				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### What AdaptiveCpp looks like
+					</div>
+					<div class="container">
+						<div class="col" style="flex-grow: 1.5;">
+							<img src="stack.png" alt="AdaptiveCpp"/>
+						</div>
+						<div class="col" data-markdown>
+							* AdaptiveCpp is a multi-backend SYCL implementation
+								* It supports NVIDIA, AMD, Intel GPUs + any CPU
+							* Additionally, it implements C++ standard parallel algorithms on all those devices
+						</div>
+					</div>
+				</section>
 				<!--Slide 16-->
 				<section>
 					<div class="hbox" data-markdown>
@@ -386,6 +401,16 @@
 						* Where both the host compiler and SYCL device compiler are invoked from the same driver.
 					</div>
 				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### AdaptiveCpp compilation models
+					</div>
+					<div class="container">
+						<div class="col">
+							<img src="acpp.png" width="70%"/>
+						</div>
+					</div>
+				</section>
 				<!--Slide 23-->
 				<section data-markdown>
 					## Where to Get Started with SYCL
@@ -405,9 +430,26 @@
 					</div>
 					<div class="container" data-markdown>
 						Code_Exercises/What_is_SYCL/source
+						Configure your environment for using SYCL and compile a source file with the SYCL compiler.  
 					</div>
-					<div class="container" data-markdown>
-						Configure your environment for using SYCL and compile a source file with the SYCL compiler.
+					<div class="container">
+						<div class="col" data-markdown>
+							For MOGON NHR, open: mod.hpc.uni-mainz.de  
+							Login using the provided credentials.
+							Open "Code Server", start a new session with the parameters &rArr;  
+
+							Then follow the instructions in the README.md file in the source directory.
+							https://github.com/AdaptiveCpp/syclacademy/blob/nhr-uds/Code_Exercises/What_is_SYCL/README.md
+						</div>
+						<div class="col" data-markdown>
+							- Use `ki-heprosycl` as account
+							- Use `A40` as partition
+							- Number of hours: `9`
+							- Number of Tasks: `1`
+							- CPUs per Task: `8`
+							- Memory: `32`
+							- Number of GPUs: `1`
+						</div>
 					</div>
 				</section>
 			</div>

@@ -11,12 +11,43 @@ for SYCL.
 
 ### 1.) Installing a SYCL implementation
 
-To install a SYCL implementation, follow the instructions in the README.md of the SYCL
-Academy repository.
+To get started for the workshop, follow these steps:
+For MOGON NHR, open: mod.hpc.uni-mainz.de  
+Login using the provided credentials.
+Open "Code Server".
+Start a new session:
+- Use `ki-heprosycl` as account
+- Use `A40` as partition
+- Number of hours: `9`
+- Number of Tasks: `1`
+- CPUs per Task: `8`
+- Memory: `32`
+- Number of GPUs: `1`
+
+Once the job is started: "Open VS Code".
+Start with:
+- CTRL+ALT+P: "Create New Terminal"
+```
+module load tools/Apptainer
+apptainer run --nv /lustre/project/ki-heprosycl/cuda-devel.sif
+```
+Now you're in the apptainer environment that we'll use for today.
+It provides all the dependencies we'll need today (LLVM, Boost, CMake, Ninja, git, ..)
+
+Get and install AdaptiveCpp:
+```
+git clone https://github.com/AdaptiveCpp/AdaptiveCpp
+cd AdaptiveCpp
+mkdir build
+cd build
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/install
+ninja install
+```
+
+Now, you have AdaptiveCpp installed.
+
 
 ### 2.) Verifying your environment
-
-Depending on the SYCL implementation used, the steps to verify your environment might vary.
 
 #### When using AdaptiveCpp
 
@@ -36,17 +67,6 @@ Loaded backend 3: Level Zero
   Found device: Intel(R) UHD Graphics 620 [0x5917]
 ```
 
-### If you're using DevCloud via SSH
-
-If you have not already installed SYCLAcademy, follow this [guide](../../README.md#connecting-to-devcloud-via-ssh) to perform the installation.
-
-Go to the What_is_SYCL directory:
-From the syclacademy directory
-```
-cd build/Code_Exercises/What_is_SYCL
-```
-and continue to [4](#4-include-the-sycl-header-file)
-
 ### 3.) Configuring the exercise project
 
 Once you have confirmed your environment is setup and available you are ready to
@@ -57,7 +77,8 @@ First fetch the tutorial samples from GitHub.
 Clone this repository ensuring that you include sub-modules.
 
 ```sh
-git clone --recursive https://github.com/codeplaysoftware/syclacademy.git
+git clone --recursive https://github.com/AdaptiveCpp/syclacademy.git -b nhr-uds
+cd syclacademy
 mkdir build
 cd build
 ```
@@ -79,50 +100,6 @@ and invoke the executable.
 
 #### Build And Execution Hints
 
-If you are using DevCloud via SSH:
-
-If you haven't done so already, follow this [guide](../../README.md#building-the-exercises-for-dpc++) to build the exercise directory structure.
-
-From the syclacademy directory
-```
-cd build/Code_Exercises/What_is_SYCL
-```
-and execute:
-* ```make What_is_SYCL_source```   - to build source.cpp
-* ```make What_is_SYCL_solution``` - to build the solution provided
-* ```make``` - to build both
-
-In Intel DevCloud, to run computational applications, you will submit jobs to a queue for execution on compute nodes,
-especially some features like longer walltime and multi-node computation is only available through the job queue.
-Please refer to the [guide][devcloud-job-submission].
-
-So wrap the binary into a script `job_submission`
-```
-#!/bin/bash
-./What_is_SYCL_source
-```
-and run:
-```sh
-qsub -l nodes=1:gpu:ppn=2 -d . job_submission
-```
-
-The stdout will be stored in ```job_submission.o<job id>``` and stderr in ```job_submission.e<job id>```.
-
-Using CMake to configure then build the exercise:
-```sh
-mkdir build
-cd build
-cmake .. "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON
-  -DSYCL_ACADEMY_ENABLE_SOLUTIONS=OFF -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx
-make What_is_SYCL_source
-```
-Alternatively from a terminal at the command line:
-```sh
-icpx -fsycl -o What_is_SYCL_source ../Code_Exercises/What_is_SYCL/source.cpp
-./What_is_SYCL_source
-```
-
-For AdaptiveCpp:
 ```sh
 # <target specification> is a list of backends and devices to target, for example
 # "generic" compiles for CPUs and GPUs using the generic single-pass compiler.
@@ -130,15 +107,13 @@ For AdaptiveCpp:
 #
 # Recent, full installations of AdaptiveCpp may not need targets to be provided,
 # compiling for "generic" by default.
-cmake -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=/insert/path/to/AdaptiveCpp -DACPP_TARGETS="<target specification>" ..
-make What_is_SYCL_source
+cmake -GNinja -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=~/install -DACPP_TARGETS="<target specification>" ..
+ninja What_is_SYCL_source
 ```
 alternatively, without CMake:
 ```sh
 cd Code_Exercises/What_is_SYCL
-/path/to/AdaptiveCpp/bin/acpp -o What_is_SYCL_source --acpp-targets="<target specification>" source.cpp
+~/install/bin/acpp -o What_is_SYCL_source --acpp-targets="<target specification>" source.cpp
 ./What_is_SYCL_source
 ```
 
-
-[devcloud-job-submission]: https://devcloud.intel.com/oneapi/documentation/job-submission/
