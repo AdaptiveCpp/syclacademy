@@ -45,15 +45,14 @@ InTile:               OutTile:
 
 #include "../helpers.hpp"
 
+#include <hipSYCL/sycl/libkernel/item.hpp>
+#include <hipSYCL/sycl/usm.hpp>
 #include <iostream>
 #include <vector>
 
 #include <sycl/sycl.hpp>
 
 #include <benchmark.h>
-
-class naive;
-class tiled;
 
 constexpr size_t N = 8192;
 constexpr size_t numIters = 100;
@@ -80,62 +79,59 @@ int main() {
     sycl::range localRange { 16, 16 };
     sycl::nd_range ndRange { globalRange, localRange };
 
-    {
-      sycl::buffer inBuf { A.data(), globalRange };
-      sycl::buffer outBuf { A_T.data(), globalRange };
-      sycl::buffer compBuf { A_T_comparison.data(), globalRange };
+    auto in_D = sycl::malloc_device<T>(A.size(), q);
+    auto out_D = sycl::malloc_device<T>(A_T.size(), q);
+    auto comp_D = sycl::malloc_device<T>(A_T_comparison.size(), q);
 
-      util::benchmark(
-          [&]() {
-            q.submit([&](sycl::handler& cgh) {
-              sycl::accessor inAcc { inBuf, cgh, sycl::read_only };
-              sycl::accessor compAcc { compBuf, cgh, sycl::write_only,
-                                       sycl::property::no_init {} };
+    q.copy<T>(A.data(), in_D, A.size()).wait();
 
-              cgh.parallel_for<naive>(ndRange, [=](sycl::nd_item<2> item) {
-                auto globalId = item.get_global_id();
-                sycl::id globalIdTranspose { globalId[1], globalId[0] };
-                compAcc[globalIdTranspose] = inAcc[globalId];
-              });
+    util::benchmark(
+        [&]() {
+          q.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
+            auto id = item.get_global_id();
+            auto linearId = id[0] * item.get_global_range(1) + id[1];
+            auto transposedId = id[1] * item.get_global_range(0) + id[0];
+            comp_D[transposedId] = in_D[linearId];
+          });
+          q.wait_and_throw();
+        },
+        numIters, "Naive matrix transpose");
+
+    util::benchmark(
+        [&]() {
+          q.submit([&](sycl::handler& cgh) {
+            sycl::local_accessor<T, 2> localAcc { localRange, cgh };
+
+            cgh.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
+              // This kernel assumes that localRange[0] == localRange[1]
+              auto globalId = item.get_global_id();
+              auto localId = item.get_local_id();
+              auto groupOffset = globalId - localId;
+              auto groupOffset_T = sycl::id { groupOffset[1], groupOffset[0] };
+
+              // Read from global memory in row major and write to local
+              // memory in column major
+              localAcc[localId[1]][localId[0]] =
+                  in_D[globalId[0] * item.get_global_range(0) + globalId[1]];
+
+              // We need to wait here to ensure that all work items have
+              // written to local memory before we start reading from it.
+              sycl::group_barrier(item.get_group());
+
+              // Read from local memory in row major and write to global
+              // memory in row major fashion
+              auto storeId = groupOffset_T + localId;
+              out_D[storeId[0] * item.get_global_range(0) + storeId[1]] =
+                  localAcc[localId[0]][localId[1]];
             });
-            q.wait_and_throw();
-          },
-          numIters, "Naive matrix transpose");
+          });
+          q.wait_and_throw();
+        },
+        numIters, "Tiled local memory matrix transpose");
 
-      util::benchmark(
-          [&]() {
-            q.submit([&](sycl::handler& cgh) {
-              sycl::accessor inAcc { inBuf, cgh, sycl::read_only };
-              sycl::accessor outAcc { outBuf, cgh, sycl::write_only,
-                                      sycl::property::no_init {} };
-              sycl::local_accessor<T, 2> localAcc { localRange, cgh };
-
-              cgh.parallel_for<tiled>(ndRange, [=](sycl::nd_item<2> item) {
-                // This kernel assumes that localRange[0] == localRange[1]
-                auto globalId = item.get_global_id();
-                auto localId = item.get_local_id();
-                auto localId_T = sycl::range { localId[1], localId[0] };
-                auto groupOffset = globalId - localId;
-                auto groupOffset_T =
-                    sycl::range { groupOffset[1], groupOffset[0] };
-
-                // Read from global memory in row major and write to local
-                // memory in column major
-                localAcc[localId_T] = inAcc[globalId];
-
-                // We need to wait here to ensure that all work items have
-                // written to local memory before we start reading from it.
-                sycl::group_barrier(item.get_group());
-
-                // Read from local memory in row major and write to global
-                // memory in row major fashion
-                outAcc[groupOffset_T + localId] = localAcc[localId];
-              });
-            });
-            q.wait_and_throw();
-          },
-          numIters, "Tiled local memory matrix transpose");
-    }
+    q.copy<T>(out_D, A_T.data(), A.size());
+    q.copy<T>(comp_D, A_T_comparison.data(), A.size());
+    q.wait_and_throw();
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }

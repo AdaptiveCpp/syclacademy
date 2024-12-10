@@ -7,15 +7,46 @@
  You should have received a copy of the license along with this
  work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
 
- SYCL Quick Reference
- ~~~~~~~~~~~~~~~~~~~~
+ The tiling should work as follows:
 
- // Declare a local accessor
- sycl::local_accessor<T, dims> local_acc{localRange, cgh};
+ The groupOffset will need to be inverted, as well as the localId.
+
+ In:                                      Out:
+ +----------------------------+           +----------------------------+
+ |             group  ^       |           |       ^                    |
+ |           Offset[1]|       |           |       |                    |
+ |                    V       |           |       |                    |
+ |<------------------>+-------+           |       |                    |
+ |   groupOffset[0]   |1     2|           |       |groupOffset[0]      |
+ |                    | tile  |           |       |                    |
+ |                    |3     4| ------->  |       |                    |
+ |                    +-------+           |       V                    |
+ |                            |           |       +-------+            |
+ |                            |           |       |1     3|            |
+ |                            |           |       | tile  |            |
+ |                            |           |       |2     4|            |
+ +----------------------------+           +-------+-------+------------+
+                                           <----->
+                                           groupOffset[1]
+
+Within a tile, each work item is assigned to a single value:
+
+InTile:               OutTile:
++------------+        +------------+
+|   local  ^ |        |  local^    |
+|   Id[1]  | |        |  Id[0]|    |
+|          V |------->|       |    |
+|<-------->* |        |       V    |
+|localId[0]  |        |<----->*    |
++------------+        +------------+
+                      localId[1]
+
 */
 
 #include "../helpers.hpp"
 
+#include <hipSYCL/sycl/libkernel/item.hpp>
+#include <hipSYCL/sycl/usm.hpp>
 #include <iostream>
 #include <vector>
 
@@ -23,7 +54,7 @@
 
 #include <benchmark.h>
 
-constexpr size_t N = 1024;
+constexpr size_t N = 8192;
 constexpr size_t numIters = 100;
 
 using T = float;
@@ -48,37 +79,36 @@ int main() {
     sycl::range localRange { 16, 16 };
     sycl::nd_range ndRange { globalRange, localRange };
 
-    {
-      sycl::buffer inBuf { A.data(), globalRange };
-      sycl::buffer outBuf { A_T.data(), globalRange };
-      sycl::buffer compBuf { A_T_comparison.data(), globalRange };
+    auto in_D = sycl::malloc_device<T>(A.size(), q);
+    auto out_D = sycl::malloc_device<T>(A_T.size(), q);
+    auto comp_D = sycl::malloc_device<T>(A_T_comparison.size(), q);
 
-      util::benchmark(
-          [&]() {
-            q.submit([&](sycl::handler& cgh) {
-              sycl::accessor inAcc { inBuf, cgh, sycl::read_only };
-              sycl::accessor compAcc { compBuf, cgh, sycl::write_only,
-                                       sycl::property::no_init {} };
+    q.copy<T>(in_D, A.data(), A.size()).wait();
 
-              cgh.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
-                auto globalId = item.get_global_id();
-                auto globalIdTranspose = sycl::id { globalId[1], globalId[0] };
-                compAcc[globalIdTranspose] = inAcc[globalId];
-              });
-            });
-            q.wait_and_throw();
-          },
-          numIters, "Naive matrix transpose");
+    util::benchmark(
+        [&]() {
+          q.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
+            auto id = item.get_global_id();
+            auto linearId = id[0] * item.get_global_range(1) + id[1];
+            auto transposedId = id[1] * item.get_global_range(0) + id[0];
+            comp_D[transposedId] = in_D[item.get_global_linear_id()];
+          });
+          q.wait_and_throw();
+        },
+        numIters, "Naive matrix transpose");
 
-      util::benchmark(
-          [&]() {
-            q.submit([&](sycl::handler& cgh) {
-              // TODO implement a tiled local memory matrix transpose.
-            });
-            q.wait_and_throw();
-          },
-          numIters, "Tiled local memory matrix transpose");
-    }
+    util::benchmark(
+        [&]() {
+          q.submit([&](sycl::handler& cgh) {
+            // TODO: Implement the tiled matrix transpose
+          });
+          q.wait_and_throw();
+        },
+        numIters, "Tiled local memory matrix transpose");
+
+    q.copy<T>(A_T.data(), out_D, A.size());
+    q.copy<T>(A_T_comparison.data(), comp_D, A.size());
+    q.wait_and_throw();
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
