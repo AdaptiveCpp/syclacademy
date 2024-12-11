@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+	    <meta charset="utf-8">
+		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
+		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
+		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
+		<script>
+			// This is needed when printing the slides to pdf
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../common-revealjs/css/print/pdf.css' : '../common-revealjs/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<script>
+		    // This is used to display the static images on each slide,
+			// See global-images in this html file and custom.css
+			(function() {
+				if(window.addEventListener) {
+					window.addEventListener('load', () => {
+						let slides = document.getElementsByClassName("slide-background");
+
+						if (slides.length === 0) {
+							slides = document.getElementsByClassName("pdf-page")
+						}
+
+						// Insert global images on each slide
+						for(let i = 0, max = slides.length; i < max; i++) {
+							let cln = document.getElementById("global-images").cloneNode(true);
+							cln.removeAttribute("id");
+							slides[i].appendChild(cln);
+						}
+
+						// Remove top level global images
+						let elem = document.getElementById("global-images");
+						elem.parentElement.removeChild(elem);
+					}, false);
+				}
+			})();
+		</script>
+		
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<div id="global-images" class="global-images">
+					<img src="../common-revealjs/images/sycl_academy.png" />
+					<img src="../common-revealjs/images/sycl_logo.png" />
+					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
+				</div>
+				<!--Slide 1-->
+				<section>
+					<div class="hbox" data-markdown>
+						## Enqueueing a Kernel
+					</div>
+				</section>
+				<!--Slide 2-->
+				<section class="hbox" data-markdown>
+					## Learning Objectives
+					* Learn about queues and how to submit work to them
+					* Learn how to define kernel functions
+					* Learn about the rules and restrictions on kernel functions
+					<!-- * Learn how to stream text from a kernel function to the console. -->
+                </section>
+				<!--Slide 3-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### The queue
+					</div>
+					<div class="container" data-markdown>
+						* In SYCL all work is submitted via commands to a `queue`.
+						* The `queue` has an associated device that any commands enqueued to it will target.
+						* There are several different ways to construct a `queue`.
+						* The most straight forward is to default construct one.
+						* This will have the SYCL runtime choose a device for you.
+					</div>
+				</section>
+				<!--Slide 4-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Precursor
+					</div>
+					<div class="container" data-markdown>
+						* In SYCL there are two models for managing data:
+						  * The buffer/accessor model.
+						  * The USM (unified shared memory) model.
+						* Which model you choose can have an effect on how you enqueue kernel functions.
+						* For now we are going to focus on the USM model.
+					</div>
+				</section>
+				<!--Slide 12-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Enqueueing SYCL Kernel Functions
+					</div>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers="1,5">gpuQueue.single_task(
+    [=]() {
+      /* kernel code */
+    }
+  ).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* SYCL kernel functions are defined using one of the kernel function invoke APIs provided by the `queue`.
+							* These enqueue a SYCL kernel function to the SYCL implementation's scheduler.
+							* Here we use `single_task`.
+						</div>
+					</div>
+				</section>
+				<!--Slide 13-->
+				<section>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers="2-4">gpuQueue.single_task(
+    [=]() {
+      /* kernel code */
+    }
+  ).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* The kernel function invoke APIs take a function object representing the kernel function.
+							* This can be a lambda expression or a class with a function call operator.
+							* This is the entry point to the code that is compiled to execute on the device.
+						</div>
+					</div>
+				</section>
+				<!--Slide 14-->
+				<section>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers="2-4">gpuQueue.single_task(
+    [=]() {
+      /* kernel code */
+    }
+).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* Different kernel invoke APIs take different parameters describing the iteration space to be invoked in.
+							* Different kernel invoke APIs can also expect different arguments to be passed to the function object.
+							* The `single_task` function describes a kernel function that is invoked exactly once, so there are no additional parameters or arguments.
+						</div>
+					</div>
+				</section>
+				<!--Slide 9-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Scheduling
+					</div>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers="1,5">gpuQueue.single_task(
+    [=]() {
+      /* kernel code */
+    }
+  ).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* The `queue` will not wait for commands to complete on destruction.
+							* However the invoke APIs return an `event` to allow you to synchronize with the completion of the commands.
+							* Here we call `wait` on the `event` to immediately wait for it to complete.
+							* There are other ways to do this, that will be covered in later lectures.
+						</div>
+					</div>
+				</section>
+				<!--Slide 10-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Scheduling
+					</div>
+					<div class="container" data-markdown>
+						![SYCL](../common-revealjs/images/scheduling.png "SYCL")
+					</div>
+					<div class="container" data-markdown>
+						* The invoke APIs (e.g. `single_task`) submit their work to the scheduler.
+						* The scheduler will then execute the commands on the target device
+							once all dependencies and requirements are satisfied.
+					</div>
+				</section>
+				<!--Slide 11-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Scheduling
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/common_scheduler.png "SYCL")
+						</div>
+					</div>
+					<div class="container" data-markdown>
+						* The same scheduler is used for all queues.
+						* This allows sharing dependency information.
+					</div>
+				</section>
+				<!--Slide 16-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### SYCL kernel function rules
+					</div>
+					<div class=container data-markdown>
+						* Must be defined using a C++ lambda or function object, they cannot be a function pointer or std::function.
+						* Must always capture or store members by-value.
+					</div>
+				</section>
+				<!--Slide 17-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### SYCL kernel function restrictions
+					</div>
+					<div class=container data-markdown>
+						* No dynamic allocation
+						* No dynamic polymorphism
+						* No exceptions
+						* No function pointers
+						* No recursion
+					</div>
+				</section>
+				<!--Slide 18-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Kernels as function objects
+					</div>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers="2-4">gpuQueue.single_task(
+    [=]() {
+      /* kernel code */
+    }
+  ).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* All the examples of SYCL kernel functions up until now have been defined using lambda expressions.
+						</div>
+					</div>
+				</section>
+				<!--Slide 19-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Kernels as function objects
+					</div>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers>struct my_kernel { 
+  void operator()(){ 
+    /* kernel function */
+  }
+};</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* However, You can also define a SYCL kernel using a regular C++ function object.
+						</div>
+					</div>
+				</section>
+				<!--Slide 20-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Kernels as function objects
+					</div>
+					<div class="container">
+						<div class="col">
+							<pre class="cpp"><code data-line-numbers>struct my_kernel { 
+  void operator()(){ 
+    /* kernel function */
+  }
+};</code></pre>
+							<pre class="cpp"><code data-line-numbers>queue gpuQueue;
+gpuQueue.single_task(my_kernel{}).wait();</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* To use a C++ function object you simply construct an instance of the type and pass it to `single_task`.
+						</div>
+					</div>
+				</section>
+				<!--Slide 22-->
+				<section>
+					<div class="hbox" data-markdown>
+						## Questions
+					</div>
+				</section>
+				<!--Slide 23-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Exercise
+					</div>
+					<div class="container" data-markdown>
+						Code_Exercises/Section_2_Enqueueing_a_Kernel_USM/source
+					</div>
+					<div class="container" data-markdown>
+						Implement a SYCL application which enqueues a kernel function to a device and streams "Hello world!" to the console.
+
+						For now, use the AdaptiveCpp specific `sycl::detail::print` function to stream text to the console.
+					</div>
+				</section>
+			</div>
+		</div>
+		<script src="../common-revealjs/js/reveal.js"></script>
+		<script src="../common-revealjs/plugin/markdown/marked.js"></script>
+		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
+		<script src="../common-revealjs/plugin/notes/notes.js"></script>
+		<script>
+			Reveal.initialize({mouseWheel: true, defaultNotes: true,
+				dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true}]
+			});
+			Reveal.configure({ slideNumber: true });
+		</script>
+	</body>
+</html>

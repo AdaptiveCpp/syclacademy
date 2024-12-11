@@ -72,28 +72,14 @@ may not match completely.
 
 | Lesson | Title | Slides | Exercise | Source | Solution | DPC++ | AdaptiveCpp |
 |--------|-------|--------|----------|--------|----------|-------|---------|
-| 01 | What is SYCL | [slides][lesson-1-slides] | [exercise][lesson-1-exercise] | [source][lesson-1-source] | [solution][lesson-1-solution] | Yes | Yes |
-| 02 | Enqueueing a Kernel | [slides][lesson-2-slides] | [exercise][lesson-2-exercise] | [source][lesson-2-source] | [solution][lesson-2-solution] | Yes | Yes |
-| 03 | Managing Data | [slides][lesson-3-slides] | [exercise][lesson-3-exercise] | [source][lesson-3-source] | [solution][lesson-3-solution] | Yes | Yes |
-| 04 | Handling Errors | [slides][lesson-4-slides] | [exercise][lesson-4-exercise] | [source][lesson-4-source] | [solution][lesson-4-solution] | Yes | Yes |
-| 05 | Device Discovery | [slides][lesson-5-slides] | [exercise][lesson-5-exercise] | [source][lesson-5-source] | [solution][lesson-5-solution] | Yes | Yes |
-| 06 | Data Parallelism | [slides][lesson-6-slides] | [exercise][lesson-6-exercise] | [source][lesson-6-source] | [solution][lesson-6-solution] | Yes | Yes |
-| 07 | Introduction to USM | [slides][lesson-7-slides] | [exercise][lesson-7-exercise] | [source][lesson-7-source] | [solution][lesson-7-solution] | Yes | Yes |
-| 08 | Using USM | [slides][lesson-8-slides] | [exercise][lesson-8-exercise] | [source][lesson-8-source] | [solution][lesson-8-solution] | Yes | Yes |
-| 09 | Asynchronous Execution | [slides][lesson-9-slides] | [exercise][lesson-9-exercise] | [source][lesson-9-source] | [solution][lesson-9-solution] | Yes | Yes |
-| 10 | Data and Dependencies | [slides][lesson-10-slides] | [exercise][lesson-10-exercise] | [source][lesson-10-source] | [solution][lesson-10-solution] | Yes | Yes |
-| 11 | In Order Queue | [slides][lesson-11-slides] | [exercise][lesson-11-exercise] | [source][lesson-11-source] | [solution][lesson-11-solution] | Yes | Yes |
-| 12 | Advanced Data Flow | [slides][lesson-12-slides] | [exercise][lesson-12-exercise] | [source][lesson-12-source] | [solution][lesson-12-solution] | Yes | Yes |
-| 13 | Multiple Devices | [slides][lesson-13-slides] | [exercise][lesson-13-exercise] | [source][lesson-13-source] | [solution][lesson-13-solution] | Yes | Yes |
-| 14 | ND Range Kernels | [slides][lesson-14-slides] | [exercise][lesson-14-exercise] | [source][lesson-14-source] | [solution][lesson-14-solution] | Yes | Yes |
-| 15 | Image Convolution | [slides][lesson-15-slides] | [exercise][lesson-15-exercise] |  | [solution][lesson-15-solution] | Yes | Yes |
-| 16 | Coalesced Global Memory | [slides][lesson-16-slides] | [exercise][lesson-16-exercise] | [source][lesson-16-source] | [solution][lesson-16-solution] | Yes | Yes |
-| 17 | Vectors | [slides][lesson-17-slides] | [exercise][lesson-17-exercise] | [source][lesson-17-source] | [solution][lesson-17-solution] | Yes | Yes |
-| 18 | Local Memory Tiling | [slides][lesson-18-slides] | [exercise][lesson-18-exercise] | [source][lesson-18-source] | [solution][lesson-18-solution] | Yes | Yes |
-| 19 | Further Optimisations | [slides][lesson-19-slides] | [exercise][lesson-19-exercise] | [source][lesson-19-source] | [solution][lesson-19-solution] | Yes | Yes |
-| 20 | Matrix Transpose | [slides][lesson-20-slides] | [exercise][lesson-20-exercise] | [source][lesson-20-source] | [solution][lesson-20-solution] | Yes | Yes |
-| 21 | More SYCL Features | [slides][lesson-21-slides] | [exercise][lesson-21-exercise] | [source][lesson-21-source] | [solution][lesson-21-solution] | Yes | Yes |
-| 22 | Functors | [slides][lesson-22-slides] | [exercise][lesson-22-exercise] | [source][lesson-22-source] | [solution][lesson-22-solution] | Yes | Yes |
+|  | What is SYCL | [slides][lesson-1-slides] | [exercise][lesson-1-exercise] | [source][lesson-1-source] | [solution][lesson-1-solution] | Yes | Yes |
+|  | Managing Data | [slides][lesson-3-slides] | [exercise][lesson-3-exercise] | [source][lesson-3-source] | [solution][lesson-3-solution] | Yes | Yes |
+|  | Handling Errors | [slides][lesson-4-slides] | [exercise][lesson-4-exercise] | [source][lesson-4-source] | [solution][lesson-4-solution] | Yes | Yes |
+|  | Device Discovery | [slides][lesson-5-slides] | [exercise][lesson-5-exercise] | [source][lesson-5-source] | [solution][lesson-5-solution] | Yes | Yes |
+|  | Data and Dependencies | [slides][lesson-10-slides] | [exercise][lesson-10-exercise] | [source][lesson-10-source] | [solution][lesson-10-solution] | Yes | Yes |
+|  | ND Range Kernels | [slides][lesson-14-slides] | [exercise][lesson-14-exercise] | [source][lesson-14-source] | [solution][lesson-14-solution] | Yes | Yes |
+|  | Image Convolution | [slides][lesson-15-slides] | [exercise][lesson-15-exercise] |  | [solution][lesson-15-solution] | Yes | Yes |
+|  | Local Memory Tiling | [slides][lesson-18-slides] | [exercise][lesson-18-exercise] | [source][lesson-18-source] | [solution][lesson-18-solution] | Yes | Yes |
 
 
 ## Building the Exercises
@@ -109,8 +95,8 @@ all of the exercises.
 
 | Implementation | Supported Platforms | Supported Devices | Required Version |
 |----------------|---------------------|-------------------|------------------|
-| DPC++ | [Intel DevCloud](#connecting-to-devcloud-via-ssh) <br> Windows 10 Visual Studio 2019 (64bit) <br> Red Hat Enterprise Linux 8, CentOS 8<br> Ubtuntu 18.04 LTS, 20.04 LTS (64bit)<br> Refer to [System Requirements][oneAPI-system-requirements] for more details | Intel CPU (OpenCL) <br> Intel GPU (OpenCL) <br> Intel FPGA (OpenCL) <br> Nvidia GPU (CUDA)* | 2021.4	|
-| AdaptiveCpp | Any Linux | CPU (OpenMP) <br> AMD GPU (ROCm)*** <br> NVIDIA GPU (CUDA)<br> Intel GPU (Level Zero)<br> Intel CPU, GPU (OpenCL) | 23.10.0 from Nov 1, 2023 or newer |
+| DPC++ | [Intel DevCloud](#connecting-to-devcloud-via-ssh) <br> Windows 10 Visual Studio 2019 (64bit) <br> Red Hat Enterprise Linux 8, CentOS 8<br> Ubtuntu 18.04 LTS, 20.04 LTS (64bit)<br> Refer to [System Requirements][oneAPI-system-requirements] for more details | Intel CPU (OpenCL) <br> Intel GPU (OpenCL) <br> Intel FPGA (OpenCL) <br> Nvidia GPU (CUDA)* | .4	|
+| AdaptiveCpp | Any Linux | CPU (OpenMP) <br> AMD GPU (ROCm)*** <br> NVIDIA GPU (CUDA)<br> Intel GPU (Level Zero)<br> Intel CPU, GPU (OpenCL) | .10.0 from Nov 1, 2023 or newer |
 
 \* Supported in open source project only
 
@@ -353,30 +339,30 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 
 [video-playlist]: https://youtube.com/playlist?list=PLCssnq0MpRdM-IUAYtNSPYck6u3oz7OZQ
 
-[lesson-1-slides]: ./Lesson_Materials/What_is_SYCL/
-[lesson-1-exercise]: ./Code_Exercises/What_is_SYCL/README.md
-[lesson-1-source]:   ./Code_Exercises/What_is_SYCL/source.cpp
-[lesson-1-solution]: ./Code_Exercises/What_is_SYCL/solution.cpp
+[lesson-1-slides]: ./Lesson_Materials/Section_1_What_is_SYCL/
+[lesson-1-exercise]: ./Code_Exercises/Section_1_What_is_SYCL/README.md
+[lesson-1-source]:   ./Code_Exercises/Section_1_What_is_SYCL/source.cpp
+[lesson-1-solution]: ./Code_Exercises/Section_1_What_is_SYCL/solution.cpp
 
 [lesson-2-slides]: ./Lesson_Materials/Enqueueing_a_Kernel/
 [lesson-2-exercise]: ./Code_Exercises/Enqueueing_a_Kernel/README.md
 [lesson-2-source]:   ./Code_Exercises/Enqueueing_a_Kernel/source.cpp
 [lesson-2-solution]: ./Code_Exercises/Enqueueing_a_Kernel/solution.cpp
 
-[lesson-3-slides]: ./Lesson_Materials/Managing_Data/
-[lesson-3-exercise]: ./Code_Exercises/Managing_Data/README.md
-[lesson-3-source]:   ./Code_Exercises/Managing_Data/source.cpp
-[lesson-3-solution]: ./Code_Exercises/Managing_Data/solution.cpp
+[lesson-3-slides]: ./Lesson_Materials/Section_3_Managing_Data/
+[lesson-3-exercise]: ./Code_Exercises/Section_3_Managing_Data/README.md
+[lesson-3-source]:   ./Code_Exercises/Section_3_Managing_Data/source.cpp
+[lesson-3-solution]: ./Code_Exercises/Section_3_Managing_Data/solution.cpp
 
-[lesson-4-slides]: ./Lesson_Materials/Handling_Errors/
-[lesson-4-exercise]: ./Code_Exercises/Handling_Errors/README.md
-[lesson-4-source]:   ./Code_Exercises/Handling_Errors/source.cpp
-[lesson-4-solution]: ./Code_Exercises/Handling_Errors/solution.cpp
+[lesson-4-slides]: ./Lesson_Materials/Section_4_Handling_Errors/
+[lesson-4-exercise]: ./Code_Exercises/Section_4_Handling_Errors/README.md
+[lesson-4-source]:   ./Code_Exercises/Section_4_Handling_Errors/source.cpp
+[lesson-4-solution]: ./Code_Exercises/Section_4_Handling_Errors/solution.cpp
 
-[lesson-5-slides]: ./Lesson_Materials/Device_Discovery/
-[lesson-5-exercise]: ./Code_Exercises/Device_Discovery/README.md
-[lesson-5-source]:   ./Code_Exercises/Device_Discovery/source.cpp
-[lesson-5-solution]: ./Code_Exercises/Device_Discovery/solution.cpp
+[lesson-5-slides]: ./Lesson_Materials/Section_5_Device_Discovery/
+[lesson-5-exercise]: ./Code_Exercises/Section_5_Device_Discovery/README.md
+[lesson-5-source]:   ./Code_Exercises/Section_5_Device_Discovery/source.cpp
+[lesson-5-solution]: ./Code_Exercises/Section_5_Device_Discovery/solution.cpp
 
 [lesson-6-slides]: ./Lesson_Materials/Data_Parallelism/
 [lesson-6-exercise]: ./Code_Exercises/Data_Parallelism/README.md
@@ -398,10 +384,10 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-9-source]:   ./Code_Exercises/Asynchronous_Execution/source.cpp
 [lesson-9-solution]: ./Code_Exercises/Asynchronous_Execution/solution.cpp
 
-[lesson-10-slides]: ./Lesson_Materials/Data_and_Dependencies/
-[lesson-10-exercise]: ./Code_Exercises/Data_and_Dependencies/README.md
-[lesson-10-source]:   ./Code_Exercises/Data_and_Dependencies/source.cpp
-[lesson-10-solution]: ./Code_Exercises/Data_and_Dependencies/solution.cpp
+[lesson-10-slides]: ./Lesson_Materials/Section_7_Data_and_Dependencies/
+[lesson-10-exercise]: ./Code_Exercises/Section_7_Data_and_Dependencies/README.md
+[lesson-10-source]:   ./Code_Exercises/Section_7_Data_and_Dependencies/source.cpp
+[lesson-10-solution]: ./Code_Exercises/Section_7_Data_and_Dependencies/solution.cpp
 
 [lesson-11-slides]: ./Lesson_Materials/In_Order_Queue/
 [lesson-11-exercise]: ./Code_Exercises/In_Order_Queue/README.md
@@ -418,15 +404,15 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-13-source]:   ./Code_Exercises/Multiple_Devices/source.cpp
 [lesson-13-solution]: ./Code_Exercises/Multiple_Devices/solution.cpp
 
-[lesson-14-slides]: ./Lesson_Materials/ND_Range_Kernel/
-[lesson-14-exercise]: ./Code_Exercises/ND_Range_Kernel/README.md
-[lesson-14-source]:   ./Code_Exercises/ND_Range_Kernel/source.cpp
-[lesson-14-solution]: ./Code_Exercises/ND_Range_Kernel/solution.cpp
+[lesson-14-slides]: ./Lesson_Materials/Section_6_ND_Range_Kernel/
+[lesson-14-exercise]: ./Code_Exercises/Section_6_ND_Range_Kernel/README.md
+[lesson-14-source]:   ./Code_Exercises/Section_6_ND_Range_Kernel/source.cpp
+[lesson-14-solution]: ./Code_Exercises/Section_6_ND_Range_Kernel/solution.cpp
 
-[lesson-15-slides]: ./Lesson_Materials/Image_Convolution/
-[lesson-15-exercise]: ./Code_Exercises/Image_Convolution/README.md
-[lesson-15-source]:   ./Code_Exercises/Image_Convolution/source.cpp
-[lesson-15-solution]: ./Code_Exercises/Image_Convolution/reference.cpp
+[lesson-15-slides]: ./Lesson_Materials/Section_8_Section_9_Image_Convolution/
+[lesson-15-exercise]: ./Code_Exercises/Section_8_Section_9_Image_Convolution/README.md
+[lesson-15-source]:   ./Code_Exercises/Section_8_Section_9_Image_Convolution/source.cpp
+[lesson-15-solution]: ./Code_Exercises/Section_8_Section_9_Image_Convolution/reference.cpp
 
 [lesson-16-slides]: ./Lesson_Materials/Coalesced_Global_Memory/
 [lesson-16-exercise]: ./Code_Exercises/Coalesced_Global_Memory/README.md
@@ -438,10 +424,10 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-17-source]:   ./Code_Exercises/Vectors/source.cpp
 [lesson-17-solution]: ./Code_Exercises/Vectors/solution.cpp
 
-[lesson-18-slides]: ./Lesson_Materials/Local_Memory_Tiling/
-[lesson-18-exercise]: ./Code_Exercises/Local_Memory_Tiling/README.md
-[lesson-18-source]:   ./Code_Exercises/Local_Memory_Tiling/source.cpp
-[lesson-18-solution]: ./Code_Exercises/Local_Memory_Tiling/solution.cpp
+[lesson-18-slides]: ./Lesson_Materials/Section_10_Local_Memory_Tiling/
+[lesson-18-exercise]: ./Code_Exercises/Section_10_Local_Memory_Tiling/README.md
+[lesson-18-source]:   ./Code_Exercises/Section_10_Local_Memory_Tiling/source.cpp
+[lesson-18-solution]: ./Code_Exercises/Section_10_Local_Memory_Tiling/solution.cpp
 
 [lesson-19-slides]: ./Lesson_Materials/Work_Group_Sizes/
 [lesson-19-exercise]: ./Code_Exercises/Work_Group_Sizes/README.md
