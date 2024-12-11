@@ -46,6 +46,7 @@ endfunction()
 
 
 add_subdirectory(Section_1_What_is_SYCL)
+add_subdirectory(Section_2_Enqueueing_a_Kernel_USM)
 add_subdirectory(Section_3_Managing_Data)
 add_subdirectory(Section_4_Handling_Errors)
 add_subdirectory(Section_5_Device_Discovery)
@@ -53,4 +54,3 @@ add_subdirectory(Section_7_Data_and_Dependencies)
 add_subdirectory(Section_6_ND_Range_Kernel)
 add_subdirectory(Section_8_Image_Convolution)
 add_subdirectory(Section_10_Local_Memory_Tiling)
-add_subdirectory(Functors)
