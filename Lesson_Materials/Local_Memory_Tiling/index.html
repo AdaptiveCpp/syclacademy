@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,7 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
-					<img src="../common-revealjs/images/codeplay.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox">
@@ -131,14 +132,80 @@
 						#### Local accessors
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-auto scratchpad = sycl::accessor&lt;int, 1, sycl::access::target::local&gt;(sycl::range{workGroupSize}, cgh);
-						</code></pre>
+						<pre class="cpp"><code class="code-100pc">auto scratchpad = sycl::local_accessor&lt;int, 1&gt;(sycl::range{workGroupSize}, cgh);</code></pre>
 					</div>
 					<div class="container" data-markdown>
-						* Local memory is allocated via an `accessor` with the `access::target::local` access target.
-						* Unlike regular `accessor`s they are not created with a `buffer`, they allocate memory per work-group for the duration of the kernel function.
+						* Local memory is allocated via an `local_accessor`.
+						* They allocate memory per work-group for the duration of the kernel function.
 						* The `range` provided is the number of elements of the specified type to allocate per work-group.
+					</div>
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### Local accessors - Command Groups background
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc" data-line-numbers>myQueue.submit([&](sycl::handler& cgh) {
+  auto scratchpad = sycl::local_accessor&lt;int, 1&gt;(sycl::range{workGroupSize}, cgh);
+  cgh.parallel_for(sycl::nd_range{globalRange, {workGroupSize}},
+    [=](nd_item<1> item) {...});
+});</code></pre>
+					</div>
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### Command groups
+					</div>
+					<div class="container">
+						<div class="col">
+							<div class="col-left-1" data-markdown>
+								![SYCL](../common-revealjs/images/command_group.png "SYCL")
+							</div>
+						</div>
+						<div class="col" data-markdown>
+							* In the buffer/accessor model or, when local memory is required, commands must be enqueued via command groups.
+							* A command group represents a series of commands to be executed by a device.
+							* These commands include:
+							  * Invoking kernel functions on a device.
+							  * Copying data to and from a device.
+							  * Waiting on other commands to complete.
+							  * Allocating local memory
+						</div>
+					</div>
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### Composing command groups
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/composing_a_command_group.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Command groups are composed by calling the `submit` member function on a `queue`.
+							* The `submit` function takes a command group function which acts as a factory for composing the command group.
+							* The `submit` function creates a `handler` and passes it into the command group function.
+							* The `handler` then composes the command group.
+						</div>
+					</div>
+				</section>
+				<section>
+				<div class="hbox" data-markdown>
+						#### Local accessors - In Context
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc" data-line-numbers>myQueue.submit([&](sycl::handler& cgh) {
+  auto scratchpad = sycl::local_accessor&lt;int, 1&gt;(sycl::range{workGroupSize}, cgh);
+  cgh.parallel_for(sycl::nd_range{globalRange, {workGroupSize}},
+    [=](nd_item<1> item) {...});
+});</code></pre>
+					</div>
+					<div class="container" data-markdown>
+						- The call to `queue::submit` gives access to the command group handler `cgh`
+						- The `cgh` is needed to allocate the local memory
+						- In this scenario `parallel_for` is added as the last action of this command group.
+						  - Caution: only one kernel can be submitted per command group
+						- The kernel submission mechanisms, we got to know so far, are just convenient wrappers for this.
 					</div>
 				</section>
 				<!--Slide 8-->
@@ -148,7 +215,7 @@ auto scratchpad = sycl::accessor&lt;int, 1, sycl::access::target::local&gt;(sycl
 					</div>
 					<div class="container" data-markdown>
 						* Local memory can be used to share partial results between work-items.
-						* When doing so it's important to synchronize between writes and read to memory to ensure all work-items have reached the same point in the program.
+						* When doing so it's important to synchronize between writes and reads to memory to ensure all work-items have reached the same point in the program.
 					</div>
 				</section>
 				<!--Slide 9-->
@@ -271,10 +338,7 @@ auto scratchpad = sycl::accessor&lt;int, 1, sycl::access::target::local&gt;(sycl
 					<div class="hbox" data-markdown>
 						#### Group_barrier
 					</div>
-					<div class="container">
-						<code class="code-100pc"><pre>
-sycl::group_barrier(item.get_group());
-						</code></pre>
+					<div class="container"><pre class="cpp"><code class="code-100pc">sycl::group_barrier(item.get_group());</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* Work-group barriers can be invoked by calling `group_barrier` and passing a `group` object.
@@ -316,7 +380,7 @@ sycl::group_barrier(item.get_group());
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>

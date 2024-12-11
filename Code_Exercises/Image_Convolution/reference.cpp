@@ -18,22 +18,20 @@
 
 #include <sycl/sycl.hpp>
 
-class image_convolution;
-
 inline constexpr util::filter_type filterType = util::filter_type::blur;
 inline constexpr int filterWidth = 11;
 inline constexpr int halo = filterWidth / 2;
 
 int main() {
-  const char* inputImageFile = "../Images/dogs.png";
-  const char* outputImageFile = "../Images/blurred_dogs.png";
+  const char* inputImageFile = "Code_Exercises/Images/dogs.png";
+  const char* outputImageFile = "Code_Exercises/Images/blurred_dogs.png";
 
   auto inputImage = util::read_image(inputImageFile, halo);
 
   auto outputImage = util::allocate_image(
       inputImage.width(), inputImage.height(), inputImage.channels());
 
-  auto filter = util::generate_filter(util::filter_type::blur, filterWidth);
+  auto filter = util::generate_filter(filterType, filterWidth);
 
   try {
     sycl::queue myQueue { sycl::gpu_selector_v };
@@ -60,56 +58,54 @@ int main() {
 
     auto filterRange = filterWidth * sycl::range(1, channels);
 
-    {
-      auto inBuf = sycl::buffer { inputImage.data(), inBufRange };
-      auto outBuf = sycl::buffer<float, 2> { outBufRange };
-      auto filterBuf = sycl::buffer { filter.data(), filterRange };
-      outBuf.set_final_data(outputImage.data());
+    auto inDev = sycl::malloc_device<float>(inBufRange.size(), myQueue);
+    auto outDev = sycl::malloc_device<float>(outBufRange.size(), myQueue);
+    auto filterDev = sycl::malloc_device<float>(filterRange.size(), myQueue);
 
-      util::benchmark(
-          [&]() {
-            myQueue.submit([&](sycl::handler& cgh) {
-              sycl::accessor inputAcc { inBuf, cgh, sycl::read_only };
-              sycl::accessor outputAcc { outBuf, cgh, sycl::write_only };
-              sycl::accessor filterAcc { filterBuf, cgh, sycl::read_only };
+    myQueue.copy<float>(inputImage.data(), inDev, inBufRange.size());
+    myQueue.copy<float>(filter.data(), filterDev, filterRange.size());
 
-              cgh.parallel_for<image_convolution>(
-                  ndRange, [=](sycl::nd_item<2> item) {
-                    auto globalId = item.get_global_id();
-                    globalId = sycl::id { globalId[1], globalId[0] };
+    // synchronize before benchmark, to not measure data transfers.
+    myQueue.wait_and_throw();
 
-                    auto channelsStride = sycl::range(1, channels);
-                    auto haloOffset = sycl::id(halo, halo);
-                    auto src = (globalId + haloOffset) * channelsStride;
-                    auto dest = globalId * channelsStride;
+    util::benchmark(
+        [&]() {
+          myQueue.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
+            auto globalId = item.get_global_id();
+            globalId = sycl::id { globalId[1], globalId[0] };
 
-                    float sum[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            auto channelsStride = sycl::range(1, channels);
+            auto haloOffset = sycl::id(halo, halo);
+            auto src = (globalId + haloOffset) * channelsStride;
+            auto dest = globalId * channelsStride;
 
-                    for (int r = 0; r < filterWidth; ++r) {
-                      for (int c = 0; c < filterWidth; ++c) {
-                        auto srcOffset =
-                            sycl::id(src[0] + (r - halo),
-                                     src[1] + ((c - halo) * channels));
-                        auto filterOffset = sycl::id(r, c * channels);
+            float sum[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-                        for (int i = 0; i < 4; ++i) {
-                          auto channelOffset = sycl::id(0, i);
-                          sum[i] += inputAcc[srcOffset + channelOffset] *
-                                    filterAcc[filterOffset + channelOffset];
-                        }
-                      }
-                    }
+            for (int r = 0; r < filterWidth; ++r) {
+              for (int c = 0; c < filterWidth; ++c) {
+                auto srcOffset = sycl::id(src[0] + (r - halo),
+                                          src[1] + ((c - halo) * channels));
+                auto filterOffset = sycl::id(r, c * channels);
 
-                    for (size_t i = 0; i < 4; ++i) {
-                      outputAcc[dest + sycl::id { 0, i }] = sum[i];
-                    }
-                  });
-            });
+                for (int i = 0; i < 4; ++i) {
+                  auto channelOffset = sycl::id(0, i);
+                  sum[i] += inDev[srcOffset[0] * inBufRange[1] + srcOffset[1] +
+                                  channelOffset[1]] *
+                            filterDev[filterOffset[0] * filterRange[1] +
+                                      filterOffset[1] + channelOffset[1]];
+                }
+              }
+            }
 
-            myQueue.wait_and_throw();
-          },
-          100, "image convolution (coalesced)");
-    }
+            for (size_t i = 0; i < 4; ++i) {
+              outDev[dest[0] * outBufRange[1] + dest[1] + i] = sum[i];
+            }
+          });
+
+          myQueue.wait_and_throw();
+        },
+        100, "image convolution (coalesced)");
+    myQueue.copy<float>(outDev, outputImage.data(), outBufRange.size());
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }

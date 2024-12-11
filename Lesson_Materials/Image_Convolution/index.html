@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -49,7 +50,7 @@
 					<img src="../common-revealjs/images/sycl_academy.png" />
 					<img src="../common-revealjs/images/sycl_logo.png" />
 					<img src="../common-revealjs/images/trademarks.png" />
-					<img src="../common-revealjs/images/codeplay.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
 				</div>
 				<!--Slide 1-->
 				<section class="hbox">
@@ -180,15 +181,12 @@
 						#### Input/output image locations
 					</div>
 					<div class="container">
-						<code>
-							<pre>
-auto inputImageFile = "../Code_Exercises/Images/dogs.png";
-auto outputImageFile = ../Code_Exercises/Images/blurred_dogs.png";
-						</code></pre>
+						<pre class="cpp"><code>auto inputImageFile = "../Code_Exercises/Images/dogs.png";
+auto outputImageFile = ../Code_Exercises/Images/blurred_dogs.png";</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* The reference code and the solutions to the remaining
-						exercises use these strings to refernce the location of
+						exercises use these strings to reference the location of
 						the input and output image.
 						* Before compiling these you will have to update this to
 						point to the image in the development environment.
@@ -200,10 +198,7 @@ auto outputImageFile = ../Code_Exercises/Images/blurred_dogs.png";
 						#### Convolution filters
 					</div>
 					<div class="container">
-						<code>
-							<pre>
-auto filter = util::generate_filter(util::filter_type filterType, int width);
-						</code></pre>
+						<pre class="cpp"><code>auto filter = util::generate_filter(util::filter_type filterType, int width);</code></pre>
 					</div>
 					<div class="container" data-markdown>
 						* The utility for generating the filter data takes a
@@ -249,7 +244,7 @@ auto filter = util::generate_filter(util::filter_type filterType, int width);
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>
