@@ -143,7 +143,10 @@ int main() {
         },
         100, "image convolution (tiled)");
     myQueue.copy<float>(outDev, outputImage.data(),
-                        outBufRange.size() * channels);
+                        outBufRange.size() * channels).wait();
+    sycl::free(inDev, myQueue);
+    sycl::free(outDev, myQueue);
+    sycl::free(filterDev, myQueue);
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }

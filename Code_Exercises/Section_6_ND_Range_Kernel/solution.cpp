@@ -41,6 +41,9 @@ void test_item() {
     gpuQueue.memcpy(r, R, dataSize * sizeof(int)).wait();
 
     gpuQueue.throw_asynchronous();
+    sycl::free(A, gpuQueue);
+    sycl::free(B, gpuQueue);
+    sycl::free(R, gpuQueue);
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
@@ -84,6 +87,9 @@ void test_nd_item() {
 
     gpuQueue.throw_asynchronous();
 
+    sycl::free(A, gpuQueue);
+    sycl::free(B, gpuQueue);
+    sycl::free(R, gpuQueue);
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
