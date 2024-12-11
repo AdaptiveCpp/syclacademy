@@ -107,7 +107,8 @@ and invoke the executable.
 #
 # Recent, full installations of AdaptiveCpp may not need targets to be provided,
 # compiling for "generic" by default.
-cmake -GNinja -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=~/install -DACPP_TARGETS="<target specification>" ..
+# Ggf. zusätzlich: -DSYCL_ACADEMY_ENABLE_SOLUTIONS=ON
+cmake -GNinja -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=~/install -DACPP_TARGETS="<target specification>" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 ninja Section_1_What_is_SYCL_source
 ```
 alternatively, without CMake:
