@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -282,18 +283,18 @@
 						#### Math Array types
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
+						<pre class="cpp"><code class="code-100pc">
 auto f4 = sycl::mfloat4{1.0f, 2.0f, 3.0f, 4.0f}; // {1.0f, 2.0f, 3.0f, 4.0f}
 						</code></pre>
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
+						<pre class="cpp"><code class="code-100pc">
 auto f2 = sycl::mfloat2{2.0f, 3.0f}; // {2.0f, 3.0f}
 auto f4 = sycl::mfloat4{1.0f, f2, 4.0f}; // {1.0f, 2.0f, 3.0f, 4.0f}
 						</code></pre>
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
+						<pre class="cpp"><code class="code-100pc">
 auto f4 = sycl::mfloat4{0.0f};  // {0.0f, 0.0f, 0.0f, 0.0f}
 						</code></pre>
 					</div>
@@ -305,11 +306,10 @@ auto f4 = sycl::mfloat4{0.0f};  // {0.0f, 0.0f, 0.0f, 0.0f}
 				<!--Slide 11-->
 				<section>
 					<div class="hbox" data-markdown>
-						#### Vec operators
+						#### Elementwise operators
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
-auto f4a = sycl::mfloat4{1.0f, 2.0f, 3.0f, 4.0f}; // {1.0f, 2.0f, 3.0f, 4.0f}
+						<pre class="cpp"><code class="code-100pc">auto f4a = sycl::mfloat4{1.0f, 2.0f, 3.0f, 4.0f}; // {1.0f, 2.0f, 3.0f, 4.0f}
 
 auto f4b = sycl::mfloat4{2.0f}; // {2.0f, 2.0f, 2.0f, 2.0f}
 
@@ -322,10 +322,10 @@ auto f4r = f4a * f4b; // {2.0f, 4.0f, 6.0f, 8.0f}
 				</section>
 				<section>
 					<div class="hbox" data-markdown>
-						#### Vec sizes
+						#### Marray Aliases
 					</div>
 					<div class="container">
-						<code class="code-100pc"><pre>
+						<pre class="cpp"><code class="code-100pc">
 sycl::mint2
 sycl::mint3
 sycl::mint4 
@@ -365,6 +365,7 @@ sycl::mint16</code></pre>
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 			Reveal.initialize({mouseWheel: true, defaultNotes: true});
 			Reveal.configure({ slideNumber: true });
 		</script>
