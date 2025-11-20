@@ -67,9 +67,9 @@ int main() {
     myQueue.copy<float>(filter.data(), filterDev,
                         filterRange.size() * channels);
 
-    auto inDev4 = reinterpret_cast<sycl::float4*>(inDev);
-    auto filterDev4 = reinterpret_cast<sycl::float4*>(filterDev);
-    auto outDev4 = reinterpret_cast<sycl::float4*>(outDev);
+    auto inDev4 = reinterpret_cast<sycl::mfloat4*>(inDev);
+    auto filterDev4 = reinterpret_cast<sycl::mfloat4*>(filterDev);
+    auto outDev4 = reinterpret_cast<sycl::mfloat4*>(outDev);
 
     // synchronize before benchmark, to not measure data transfers.
     myQueue.wait_and_throw();
@@ -78,7 +78,7 @@ int main() {
         [&] {
           myQueue.submit([&](sycl::handler& cgh) {
             auto scratchpad =
-                sycl::local_accessor<sycl::float4, 2>(scratchpadRange, cgh);
+                sycl::local_accessor<sycl::mfloat4, 2>(scratchpadRange, cgh);
 
             cgh.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
               auto globalId = item.get_global_id();
@@ -102,8 +102,9 @@ int main() {
                *         | ||                 ||         ||  |
                *     local ||   iteration 1   ||  it 2   ||  |
                *  Range[1] ||     load        ||  load   ||
-               *         | ||                 ||         ||  localRange[1]
-               * + | ||                 ||         ||  halo * 2 V || || ||
+               *         | ||                 ||         ||  localRange[1] +
+               *         | ||                 ||         ||  halo * 2
+               *         V ||                 ||         ||
                *           |+-----------------++---------+|  |
                *           |+-----------------++---------+|  |
                *           ||                 ||         ||  |
@@ -111,8 +112,7 @@ int main() {
                *           ||                 ||         ||  |
                *           |+-----------------++---------+|  |
                *           +------------------------------+  V
-               */
-
+              */
               for (auto i = localId[0]; i < scratchpadRange[0];
                    i += localRange[0]) {
                 for (auto j = localId[1]; j < scratchpadRange[1];
@@ -125,7 +125,7 @@ int main() {
 
               sycl::group_barrier(item.get_group());
 
-              auto sum = sycl::float4 { 0.0f, 0.0f, 0.0f, 0.0f };
+              auto sum = sycl::mfloat4{ 0.0f, 0.0f, 0.0f, 0.0f };
 
               for (int r = 0; r < filterWidth; ++r) {
                 for (int c = 0; c < filterWidth; ++c) {
