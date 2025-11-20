@@ -8,6 +8,8 @@
  work.  If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
 */
 
+// #define USE_MARRAY
+
 #include "../helpers.hpp"
 
 #include <algorithm>
@@ -50,6 +52,7 @@ int main() {
     auto localRange = sycl::range(1, 32);
     auto ndRange = sycl::nd_range(globalRange, localRange);
 
+#ifndef USE_MARRAY
     auto inBufRange =
         sycl::range(inputImgHeight + (halo * 2), inputImgWidth + (halo * 2)) *
         sycl::range(1, channels);
@@ -103,8 +106,58 @@ int main() {
 
           myQueue.wait_and_throw();
         },
-        500, "image convolution (coalesced)");
-    myQueue.copy<float>(outDev, outputImage.data(), outBufRange.size()).wait_and_throw();
+        100, "image convolution (coalesced)");
+    myQueue.copy<float>(outDev, outputImage.data(), outBufRange.size())
+        .wait_and_throw();
+#else
+    auto inBufRange =
+        sycl::range(inputImgHeight + (halo * 2), inputImgWidth + (halo * 2));
+    auto outBufRange = sycl::range(inputImgHeight, inputImgWidth);
+
+    auto filterRange = filterWidth * sycl::range(1, 1);
+
+    auto inDev = sycl::malloc_device<sycl::mfloat4>(inBufRange.size(), myQueue);
+    auto outDev = sycl::malloc_device<sycl::mfloat4>(outBufRange.size(), myQueue);
+    auto filterDev = sycl::malloc_device<sycl::mfloat4>(filterRange.size(), myQueue);
+
+    myQueue.copy<sycl::mfloat4>(inputImage.data(), inDev, inBufRange.size());
+    myQueue.copy<sycl::mfloat4>(filter.data(), filterDev, filterRange.size());
+
+    // synchronize before benchmark, to not measure data transfers.
+    myQueue.wait_and_throw();
+
+    util::benchmark(
+        [&]() {
+          myQueue.parallel_for(ndRange, [=](sycl::nd_item<2> item) {
+            auto globalId = item.get_global_id();
+
+            auto haloOffset = sycl::id(halo, halo);
+            auto src = (globalId + haloOffset);
+            auto dest = globalId;
+
+            sycl::mfloat4 sum{ 0.0f, 0.0f, 0.0f, 0.0f };
+
+            for (int r = 0; r < filterWidth; ++r) {
+              for (int c = 0; c < filterWidth; ++c) {
+                auto srcOffset = sycl::id(src[0] + (r - halo),
+                                          src[1] + ((c - halo)));
+                auto filterOffset = sycl::id(r, c);
+
+                  sum[i] += inDev[srcOffset[0] * inBufRange[1] + srcOffset[1]] *
+                            filterDev[filterOffset[0] * filterRange[1] +
+                                      filterOffset[1]];
+              }
+            }
+
+            outDev[dest[0] * outBufRange[1] + dest[1]] = sum;
+          });
+
+          myQueue.wait_and_throw();
+        },
+        100, "image convolution (coalesced)");
+    myQueue.copy<sycl::mfloat4>(outDev, outputImage.data(), outBufRange.size())
+        .wait_and_throw();
+#endif
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
     SYCLACADEMY_ASSERT(false);

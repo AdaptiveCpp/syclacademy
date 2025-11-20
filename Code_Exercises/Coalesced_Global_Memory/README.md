@@ -23,6 +23,15 @@ auto columnMajorLinearId = (idx[0] * height) + idx[1];  // column-major
 
 Try using both of these and compare the execution time of each.
 
+### 2.) Use `marray` to further improve memory access patterns.
+
+The image has 4 channels, which are interleaved in memory.
+For many devices, it actually improves the performance when we just load all 4 channels at the same time.
+This is where `sycl::marray` can be handy.
+
+Replace all memory allocations with `sycl::mfloat4` to represent all 4 colors of a pixel in a single `marray<float, 4>`.
+Then, after loading the values, you can also just do elementwise operations on them.
+
 ## Build and execution hints
 
 From the syclacademy directory
