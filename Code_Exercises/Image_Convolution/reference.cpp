@@ -105,7 +105,7 @@ int main() {
           myQueue.wait_and_throw();
         },
         100, "image convolution (coalesced)");
-    myQueue.copy<float>(outDev, outputImage.data(), outBufRange.size());
+    myQueue.copy<float>(outDev, outputImage.data(), outBufRange.size()).wait_and_throw();
   } catch (const sycl::exception& e) {
     std::cout << "Exception caught: " << e.what() << std::endl;
   }
