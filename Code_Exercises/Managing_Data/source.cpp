@@ -19,10 +19,17 @@
  * // Allocate device memory
  * auto * devPtr = sycl::malloc_device<int>(mycount, q);
  *
- * // Memcpy
- * q.memcpy(dst, src, sizeof(T)*n).wait();
- * // (dst and src are pointers)
+ * // Do a memcpy
+ * auto event = q.memcpy(dst_ptr, src_ptr, sizeof(T)*n);
+ * // Do a memcpy with dependent events
+ * auto event = q.memcpy(dst_ptr, src_ptr, sizeof(T)*n, {event1, event2});
  *
+ * // Wait on an event
+ * event.wait();
+ *
+ * // Wait on a queue
+ * q.wait();
+ * 
  * // Free memory
  * sycl::free(ptr, q);
  *
@@ -36,10 +43,22 @@
 #include "../helpers.hpp"
 
 int main() {
-  int a = 18, b = 24, r = 0;
+  int a = 74, b = 24, c = 18, r = 0;
 
-  // Task: Compute a+b on the SYCL device using USM
-  r = a + b;
+  // Task: Run these kernels on the SYCL device, respecting the dependencies
+  // as shown in the README
+
+  // Kernel A:
+  a = a * 2;
+
+  // Kernel B:
+  b = b + a;
+
+  // Kernel C:
+  c = c - a;
+
+  // Kernel D:
+  r = b + c;
 
   SYCLACADEMY_ASSERT(r == 42);
 }
