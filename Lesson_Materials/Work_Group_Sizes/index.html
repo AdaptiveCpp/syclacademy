@@ -5,6 +5,7 @@
 	    <meta charset="utf-8">
 		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
 		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
 		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
 		<script>
 			// This is needed when printing the slides to pdf
@@ -194,7 +195,7 @@
 					<div class="container" data-markdown>
 						* Coalescing global memory access.
 						* Using local memory.
-						* Explicit vectorization.
+						* Using math array types.
 					</div>
 				</section>
 				<!--Slide 14-->
@@ -208,7 +209,7 @@
 					<div class="container" data-markdown>
 						* Double buffering.
 						* Using constant memory.
-						* Using texture memory.
+						* Using group functions.
 					</div>
 				</section>
 				<!--Slide 15-->
@@ -300,7 +301,7 @@
 					</div>
 				</section>
 				<!--Slide 21-->
-				<section>
+				<!-- <section>
 					<div class="hbox" data-markdown>
 						#### Use texture memory
 					</div>
@@ -313,7 +314,17 @@
 						* This can be more efficient when accessing data in a pixel format.
 						* To use texture memory use the `image` class.
 					</div>
-				</section>
+				</section> -->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Use group functions
+					</div>
+					<div class="container" data-markdown>
+						* SYCL provides group functions for explicit communication and synchronization between work-items in a work-group.
+						* Many devices provide optimized hardware support for these functions on a sub-group level.
+						* Using these functions can often be more efficient than using local memory and barriers.
+						* Examples of group functions include `group_broadcast`, `shift_group_right/left`, `group_reduce`, ..
+					</div>
 				<!--Slide 22-->
 				<section>
 					<div class="hbox" data-markdown>
@@ -323,6 +334,9 @@
 						* Profile your kernel functions.
 						* Follow vendor optimization guides.
 						* Tune your algorithms.
+						* AdaptiveCpp: Profile your application with the tools of your GPU vendor!
+							* As an example, NVIDIA Nsight Systems provides insights into blocking API usage, kernel/memory overlap.
+							* Nsight Compute provides detailed kernel profiling, including memory throughput, occupancy, warp efficiency, and more.
 					</div>
 				</section>
 				<!--Slide 23-->
@@ -353,7 +367,7 @@
 		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
 		<script src="../common-revealjs/plugin/notes/notes.js"></script>
 		<script>
-			Reveal.initialize({mouseWheel: true, defaultNotes: true});
+			Reveal.initialize({mouseWheel: true, defaultNotes: true, dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); }}]});
 			Reveal.configure({ slideNumber: true });
 		</script>
 	</body>
