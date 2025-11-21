@@ -74,12 +74,12 @@ may not match completely.
 |--------|-------|--------|----------|--------|----------|-------|---------|
 |  | What is SYCL | [slides][lesson-1-slides] | [exercise][lesson-1-exercise] | [source][lesson-1-source] | [solution][lesson-1-solution] | Yes | Yes |
 |  | Managing Data | [slides][lesson-3-slides] | [exercise][lesson-3-exercise] | [source][lesson-3-source] | [solution][lesson-3-solution] | Yes | Yes |
-|  | Handling Errors | [slides][lesson-4-slides] | [exercise][lesson-4-exercise] | [source][lesson-4-source] | [solution][lesson-4-solution] | Yes | Yes |
 |  | Device Discovery | [slides][lesson-5-slides] | [exercise][lesson-5-exercise] | [source][lesson-5-source] | [solution][lesson-5-solution] | Yes | Yes |
-|  | Data and Dependencies | [slides][lesson-10-slides] | [exercise][lesson-10-exercise] | [source][lesson-10-source] | [solution][lesson-10-solution] | Yes | Yes |
 |  | ND Range Kernels | [slides][lesson-14-slides] | [exercise][lesson-14-exercise] | [source][lesson-14-source] | [solution][lesson-14-solution] | Yes | Yes |
 |  | Image Convolution | [slides][lesson-15-slides] | [exercise][lesson-15-exercise] |  | [solution][lesson-15-solution] | Yes | Yes |
+|  | Coalesced Global Memory | [slides][lesson-16-slides] | [exercise][lesson-16-exercise] | [source][lesson-16-source] | [solution][lesson-16-solution] | Yes | Yes |
 |  | Local Memory Tiling | [slides][lesson-18-slides] | [exercise][lesson-18-exercise] | [source][lesson-18-source] | [solution][lesson-18-solution] | Yes | Yes |
+|  | Further Optimisations | [slides][lesson-19-slides] | [exercise][lesson-19-exercise] | [source][lesson-19-source] | [solution][lesson-19-solution] | Yes | Yes |
 
 
 ## Building the Exercises
@@ -349,20 +349,20 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-2-source]:   ./Code_Exercises/Enqueueing_a_Kernel/source.cpp
 [lesson-2-solution]: ./Code_Exercises/Enqueueing_a_Kernel/solution.cpp
 
-[lesson-3-slides]: ./Lesson_Materials/Section_3_Managing_Data/
-[lesson-3-exercise]: ./Code_Exercises/Section_3_Managing_Data/README.md
-[lesson-3-source]:   ./Code_Exercises/Section_3_Managing_Data/source.cpp
-[lesson-3-solution]: ./Code_Exercises/Section_3_Managing_Data/solution.cpp
+[lesson-3-slides]: ./Lesson_Materials/Section_2_Managing_Data/
+[lesson-3-exercise]: ./Code_Exercises/Section_2_Managing_Data/README.md
+[lesson-3-source]:   ./Code_Exercises/Section_2_Managing_Data/source.cpp
+[lesson-3-solution]: ./Code_Exercises/Section_2_Managing_Data/solution.cpp
 
-[lesson-4-slides]: ./Lesson_Materials/Section_4_Handling_Errors/
-[lesson-4-exercise]: ./Code_Exercises/Section_4_Handling_Errors/README.md
-[lesson-4-source]:   ./Code_Exercises/Section_4_Handling_Errors/source.cpp
-[lesson-4-solution]: ./Code_Exercises/Section_4_Handling_Errors/solution.cpp
+[lesson-4-slides]: ./Lesson_Materials/Handling_Errors/
+[lesson-4-exercise]: ./Code_Exercises/Handling_Errors/README.md
+[lesson-4-source]:   ./Code_Exercises/Handling_Errors/source.cpp
+[lesson-4-solution]: ./Code_Exercises/Handling_Errors/solution.cpp
 
-[lesson-5-slides]: ./Lesson_Materials/Section_5_Device_Discovery/
-[lesson-5-exercise]: ./Code_Exercises/Section_5_Device_Discovery/README.md
-[lesson-5-source]:   ./Code_Exercises/Section_5_Device_Discovery/source.cpp
-[lesson-5-solution]: ./Code_Exercises/Section_5_Device_Discovery/solution.cpp
+[lesson-5-slides]: ./Lesson_Materials/Section_3_Device_Discovery/
+[lesson-5-exercise]: ./Code_Exercises/Section_3_Device_Discovery/README.md
+[lesson-5-source]:   ./Code_Exercises/Section_3_Device_Discovery/source.cpp
+[lesson-5-solution]: ./Code_Exercises/Section_3_Device_Discovery/solution.cpp
 
 [lesson-6-slides]: ./Lesson_Materials/Data_Parallelism/
 [lesson-6-exercise]: ./Code_Exercises/Data_Parallelism/README.md
@@ -384,10 +384,10 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-9-source]:   ./Code_Exercises/Asynchronous_Execution/source.cpp
 [lesson-9-solution]: ./Code_Exercises/Asynchronous_Execution/solution.cpp
 
-[lesson-10-slides]: ./Lesson_Materials/Section_7_Data_and_Dependencies/
-[lesson-10-exercise]: ./Code_Exercises/Section_7_Data_and_Dependencies/README.md
-[lesson-10-source]:   ./Code_Exercises/Section_7_Data_and_Dependencies/source.cpp
-[lesson-10-solution]: ./Code_Exercises/Section_7_Data_and_Dependencies/solution.cpp
+[lesson-10-slides]: ./Lesson_Materials/Data_and_Dependencies/
+[lesson-10-exercise]: ./Code_Exercises/Data_and_Dependencies/README.md
+[lesson-10-source]:   ./Code_Exercises/Data_and_Dependencies/source.cpp
+[lesson-10-solution]: ./Code_Exercises/Data_and_Dependencies/solution.cpp
 
 [lesson-11-slides]: ./Lesson_Materials/In_Order_Queue/
 [lesson-11-exercise]: ./Code_Exercises/In_Order_Queue/README.md
@@ -404,35 +404,35 @@ cmake ../ "-GUnix Makefiles" -DSYCL_ACADEMY_USE_DPCPP=ON -DSYCL_ACADEMY_ENABLE_S
 [lesson-13-source]:   ./Code_Exercises/Multiple_Devices/source.cpp
 [lesson-13-solution]: ./Code_Exercises/Multiple_Devices/solution.cpp
 
-[lesson-14-slides]: ./Lesson_Materials/Section_6_ND_Range_Kernel/
-[lesson-14-exercise]: ./Code_Exercises/Section_6_ND_Range_Kernel/README.md
-[lesson-14-source]:   ./Code_Exercises/Section_6_ND_Range_Kernel/source.cpp
-[lesson-14-solution]: ./Code_Exercises/Section_6_ND_Range_Kernel/solution.cpp
+[lesson-14-slides]: ./Lesson_Materials/Section_4_ND_Range_Kernel/
+[lesson-14-exercise]: ./Code_Exercises/Section_4_ND_Range_Kernel/README.md
+[lesson-14-source]:   ./Code_Exercises/Section_4_ND_Range_Kernel/source.cpp
+[lesson-14-solution]: ./Code_Exercises/Section_4_ND_Range_Kernel/solution.cpp
 
-[lesson-15-slides]: ./Lesson_Materials/Section_8_Section_9_Image_Convolution/
-[lesson-15-exercise]: ./Code_Exercises/Section_8_Section_9_Image_Convolution/README.md
-[lesson-15-source]:   ./Code_Exercises/Section_8_Section_9_Image_Convolution/source.cpp
-[lesson-15-solution]: ./Code_Exercises/Section_8_Section_9_Image_Convolution/reference.cpp
+[lesson-15-slides]: ./Lesson_Materials/Section_5_Image_Convolution/
+[lesson-15-exercise]: ./Code_Exercises/Section_5_Image_Convolution/README.md
+[lesson-15-source]:   ./Code_Exercises/Section_5_Image_Convolution/source.cpp
+[lesson-15-solution]: ./Code_Exercises/Section_5_Image_Convolution/reference.cpp
 
-[lesson-16-slides]: ./Lesson_Materials/Coalesced_Global_Memory/
-[lesson-16-exercise]: ./Code_Exercises/Coalesced_Global_Memory/README.md
-[lesson-16-source]:   ./Code_Exercises/Coalesced_Global_Memory/source.cpp
-[lesson-16-solution]: ./Code_Exercises/Coalesced_Global_Memory/solution.cpp
+[lesson-16-slides]: ./Lesson_Materials/Section_6_Coalesced_Global_Memory/
+[lesson-16-exercise]: ./Code_Exercises/Section_6_Coalesced_Global_Memory/README.md
+[lesson-16-source]:   ./Code_Exercises/Section_6_Coalesced_Global_Memory/source.cpp
+[lesson-16-solution]: ./Code_Exercises/Section_6_Coalesced_Global_Memory/solution.cpp
 
 [lesson-17-slides]: ./Lesson_Materials/Vectors/
 [lesson-17-exercise]: ./Code_Exercises/Vectors/README.md
 [lesson-17-source]:   ./Code_Exercises/Vectors/source.cpp
 [lesson-17-solution]: ./Code_Exercises/Vectors/solution.cpp
 
-[lesson-18-slides]: ./Lesson_Materials/Section_10_Local_Memory_Tiling/
-[lesson-18-exercise]: ./Code_Exercises/Section_10_Local_Memory_Tiling/README.md
-[lesson-18-source]:   ./Code_Exercises/Section_10_Local_Memory_Tiling/source.cpp
-[lesson-18-solution]: ./Code_Exercises/Section_10_Local_Memory_Tiling/solution.cpp
+[lesson-18-slides]: ./Lesson_Materials/Section_7_Local_Memory_Tiling/
+[lesson-18-exercise]: ./Code_Exercises/Section_7_Local_Memory_Tiling/README.md
+[lesson-18-source]:   ./Code_Exercises/Section_7_Local_Memory_Tiling/source.cpp
+[lesson-18-solution]: ./Code_Exercises/Section_7_Local_Memory_Tiling/solution.cpp
 
-[lesson-19-slides]: ./Lesson_Materials/Work_Group_Sizes/
-[lesson-19-exercise]: ./Code_Exercises/Work_Group_Sizes/README.md
-[lesson-19-source]:   ./Code_Exercises/Work_Group_Sizes/source.cpp
-[lesson-19-solution]: ./Code_Exercises/Work_Group_Sizes/solution.cpp
+[lesson-19-slides]: ./Lesson_Materials/Section_8_Work_Group_Sizes/
+[lesson-19-exercise]: ./Code_Exercises/Section_8_Work_Group_Sizes/README.md
+[lesson-19-source]:   ./Code_Exercises/Section_8_Work_Group_Sizes/source.cpp
+[lesson-19-solution]: ./Code_Exercises/Section_8_Work_Group_Sizes/solution.cpp
 
 [lesson-20-slides]: ./Lesson_Materials/Matrix_Transpose/
 [lesson-20-exercise]: ./Code_Exercises/Matrix_Transpose/README.md

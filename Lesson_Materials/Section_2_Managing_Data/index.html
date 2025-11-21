@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+	    <meta charset="utf-8">
+		<link rel="stylesheet" href="../common-revealjs/css/reveal.css">
+		<link rel="stylesheet" href="../common-revealjs/css/theme/white.css">
+		<link rel="stylesheet" href="../common-revealjs/css/highlight/styles/stackoverflow-light.css">
+		<link rel="stylesheet" href="../common-revealjs/css/custom.css">
+		<script>
+			// This is needed when printing the slides to pdf
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../common-revealjs/css/print/pdf.css' : '../common-revealjs/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<script>
+		    // This is used to display the static images on each slide,
+			// See global-images in this html file and custom.css
+			(function() {
+				if(window.addEventListener) {
+					window.addEventListener('load', () => {
+						let slides = document.getElementsByClassName("slide-background");
+
+						if (slides.length === 0) {
+							slides = document.getElementsByClassName("pdf-page")
+						}
+
+						// Insert global images on each slide
+						for(let i = 0, max = slides.length; i < max; i++) {
+							let cln = document.getElementById("global-images").cloneNode(true);
+							cln.removeAttribute("id");
+							slides[i].appendChild(cln);
+						}
+
+						// Remove top level global images
+						let elem = document.getElementById("global-images");
+						elem.parentElement.removeChild(elem);
+					}, false);
+				}
+			})();
+		</script>
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<div id="global-images" class="global-images">
+					<img src="../common-revealjs/images/sycl_academy.png" />
+					<img src="../common-revealjs/images/sycl_logo.png" />
+					<img src="../common-revealjs/images/trademarks.png" />
+					<img src="../common-revealjs/images/nhr-sw.png" />
+				</div>
+				<!--Slide 1-->
+				<section class="hbox" data-markdown>
+					## Managing Data
+				</section>
+				<!--Slide 2-->
+				<section class="hbox" data-markdown>
+					## Learning Objectives
+					* Learn about the USM data management model
+					* Learn how to allocate, transfer and free memory using USM.
+					* Learn how to access data in a kernel function
+					* Learn about the variations of USM
+					* Learn how to represent basic data flow graphs
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### Memory Models
+					</div>
+					<div class="container" data-markdown>
+						* In SYCL there are two models for managing data:
+						  * The buffer/accessor model.
+						  * The USM (unified shared memory) model &larr; *we will focus on this*.
+						* Which model you choose can have an effect on how you enqueue kernel functions.
+					</div>
+				</section>
+				<!--Slide 3-->
+				<!--Slide 3A-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### CPU and GPU Memory
+					</div>
+					<div class="container" data-markdown>
+						* A GPU has its own memory, separate to CPU memory.
+						* In order for the GPU to use memory from the CPU, the following actions must take place (either explicitly or implicitly):
+						    * Memory allocation on the GPU.
+						    * Data migration from the CPU to the allocation on the GPU.
+						    * Some computation on the GPU.
+						    * Migration of the result back to the CPU.
+					</div>
+					<img src="../common-revealjs/images/gpu_cpu_memory.png" height="400">
+				</section>
+				<!--Slide 3A-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### CPU and GPU Memory
+					</div>
+					<div class="container" data-markdown>
+						* Memory transfers between CPU and GPU are a bottleneck.
+						* We want to minimize these transfers, when possible.
+					</div>
+					<img src="../common-revealjs/images/gpu_cpu_memory.png" height="400">
+				</section>
+				
+				<section>
+					<div class="hbox" data-markdown>
+						#### Unified virtual address space
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/unified_virtual_address_space.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* USM memory allocations return pointers which are consistent between the host application and kernel functions on a device
+							* Representing data between the host and device(s) does not require creating accessors
+							* Pointer-based API more familiar to C or C++ programmers
+						</div>
+					</div>
+				</section>
+				<!--Slide 5-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Pointer based structures
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/pointer_based_structures.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Data is moved between the host and device(s) in a span of memory in bytes rather than a buffer of a specific type
+							* Pointers within that region of memory can freely point to any other address in that region
+							* Easier to port existing C or C++ code to use SYCL
+						</div>
+					</div>
+				</section>
+				<!--Slide 6-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Explicit memory management
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/explicit_data_movement.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Memory is allocated and data is moved using explicit routines
+							* Moving data between the host and device(s) does not require accessors or submitting command groups
+							* The SYCL runtime will not perform any data dependency analysis, dependencies between commands must be managed manually
+						</div>
+					</div>
+				</section>
+				<!--Slide 7-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Shared memory allocations
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/shared_memory.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Some platforms will support variants of USM where memory allocations share the same memory region between the host and device(s)
+							* No explicit routines are required to move the data between the host and device(s)
+						</div>
+					</div>
+				</section>
+				<!--Slide 8-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### USM allocation types
+					</div>
+					<div class="container" data-markdown>
+						USM has three different kinds of memory allocation
+					</div>
+					<div class="container" data-markdown>
+						* A **host** allocation is allocated in host memory
+						* A **device** allocation is allocation in device memory
+						* A **shared** allocation is allocated in shared memory and can migrate back and forth
+					</div>
+				</section>
+				<!--Slide 9-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### USM variants
+					</div>
+					<div class="container" data-markdown>
+						USM has four variants which a platform can support with varying levels of support
+					</div>
+					<div class="container" data-markdown>
+						![SYCL](../common-revealjs/images/usm_variants.png "SYCL")
+					</div>
+				</section>
+				<!--Slide 10-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Querying for support
+					</div>
+					<div class="container" data-markdown>
+						Each SYCL platform and its device(s) will support
+						different variants of USM and different kinds of memory allocation
+					</div>
+					<pre><code>if (dev.has(sycl::aspect::usm_device_allocations))</code></pre>
+				</section>
+				<!--Slide 3-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Using USM - Malloc Device
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc">// Allocate memory on device
+T *device_ptr = sycl::malloc_device&lt;T&gt;(n, myQueue);
+
+// Copy data to device
+myQueue.memcpy(device_ptr, cpu_ptr, n * sizeof(T));
+
+// ...
+// Do some computation on device
+// ...
+
+// Copy data back to CPU
+myQueue.memcpy(result_ptr, device_ptr, n * sizeof(T)).wait();
+
+// Free allocated data
+sycl::free(device_ptr, myQueue);</code></pre>
+					</div>
+					<div class="container" data-markdown>
+						* It is important to free memory after it has been 
+						used to avoid memory leaks.
+					</div>
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						#### Using USM - Malloc Shared
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc">// Allocate shared memory 
+T *shared_ptr = sycl::malloc_shared&lt;T&gt;(n, myQueue);
+
+// Shared memory can be accessed on host as well as device
+for (auto i = 0; i &lt; n; ++i)
+  shared_ptr[i] = i;
+
+// ...
+// Do some computation on device
+// ...
+
+// Free allocated data
+sycl::free(shared_ptr, myQueue);</code></pre>
+					</div>
+					<div class="container" data-markdown>
+						* Shared memory is accessible on host and device.
+						* Performance of shared memory accesses may be poor depending on platform.
+					</div>
+				</section>
+				<!--Slide 20-->
+
+				<!--Slide 4-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Creating dependencies
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/data_dependency.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Kernel A first writes to the data
+							* Kernel B then reads from and writes to the data
+							* This creates a read-after-write (RAW) relationship
+							* There must be a dependency created between Kernel A and Kernel B
+						</div>
+					</div>
+				</section>
+				<!--Slide 5-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Moving data
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/data_movement.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Here both kernel functions are enqueued to the same device, in this case a GPU
+							* The data must be copied to the GPU before the Kernel A is executed
+							* The data must remain on the GPU for Kernel B to be executed
+							* The data must be copied back to the host after Kernel B has executed
+						</div>
+					</div>
+				</section>
+				<!--Slide 6-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Data flow
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/data_flow.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* Combining kernel function dependencies and the data movement dependencies we have a final data flow graph
+							* This graph defines the order in which all commands must execute in order to maintain consistency
+							* In more complex data flow graphs there may be multiple orderings which can achieve the same consistency
+						</div>
+					</div>
+				</section>
+
+				<!--Slide 11-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Data flow with USM
+					</div>
+					<div class="container">
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers>auto devPtr = sycl::malloc_device&lt;int&gt;(1, q);
+
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.single_task(e1,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e3 = q.single_task(e2,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e4 = q.memcpy(data, devPtr, sizeof(int), e3);
+e4.wait();
+
+sycl::free(devPtr, q);</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* The USM data management model data model is prescriptive
+							* Dependencies are defined explicitly by passing around `event` objects
+							* Data movement is performed explicitly by enqueuing `memcpy` operations
+							* The user is responsible for ensuring data dependencies and consistency are maintained
+						</div>
+					</div>
+				</section>
+				<!--Slide 12-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Data flow with USM
+					</div>
+					<div class="container">
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers="3-4,9,14-15">auto devPtr = sycl::malloc_device&lt;int&gt;(1, q);
+
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.single_task(e1,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e3 = q.single_task(e2,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e4 = q.memcpy(data, devPtr, sizeof(int), e3);
+e4.wait();
+
+sycl::free(devPtr, q);</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* Each command enqueued to the `queue` produces an `event` object which can be used to synchronize with the completion of that command
+							* Passing those `event` objects when enqueuing other commands creates dependencies
+						</div>
+					</div>
+				</section>
+				<!--Slide 13-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Data flow with USM
+					</div>
+					<div class="container">
+						<div class="col" style="flex-grow:1.25;">
+							<pre class="cpp"><code class="code-100pc" data-line-numbers="3,14">auto devPtr = sycl::malloc_device&lt;int&gt;(1, q);
+
+auto e1 = q.memcpy(devPtr, data, sizeof(int));
+auto e2 = q.single_task(e1,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e3 = q.single_task(e2,
+  [=]() {
+    *devPtr = /* some computation */
+  });
+
+auto e4 = q.memcpy(data, devPtr, sizeof(int), e3);
+e4.wait();
+
+sycl::free(devPtr, q);</code></pre>
+						</div>
+						<div class="col" data-markdown>
+							* The `memcpy` member functions are used to enqueue data movement commands, moving the data to the GPU and then back again
+						</div>
+					</div>
+				</section>
+				<!--Slide 14-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Concurrent data flow
+					</div>
+					<div class="container">
+						<div class="col" data-markdown>
+							![SYCL](../common-revealjs/images/concurrent_data_flow.png "SYCL")
+						</div>
+						<div class="col" data-markdown>
+							* If two kernels are accessing different memory regions then there is no dependency between them
+							* In this case the two kernels and their respective data movement are independent
+							* By default `queue`s are out-of-order which means that these commands can execute in any order
+							* They could also execute concurrently if the target device is able to do so
+						</div>
+					</div>
+				</section>
+
+				<!--Slide 16-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Concurrent data flow with USM
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc" data-line-numbers="4,7,13,16">auto devPtrA = sycl::malloc_device&lt;int&gt;(1, q);
+auto devPtrB = sycl::malloc_device&lt;int&gt;(1, q);
+
+auto e1 = q.memcpy(devPtrA, dataA, sizeof(int));
+auto e2 = q.memcpy(devPtrB, dataB, sizeof(int));
+
+auto e3 = q.single_task(e1,
+    [=]() { *devPtrA = /* some computation */ });
+
+auto e4 = q.single_task(e2,
+	[=]() { *devPtrB = /* some computation */ });
+
+auto e5 = q.memcpy(dataA, devPtrA, sizeof(int), e3);
+auto e6 = q.memcpy(dataB, devPtrB, sizeof(int), e4);
+
+e5.wait();
+e6.wait();
+
+sycl::free(devPtrA, q);
+sycl::free(devPtrB, q);</code></pre>
+					</div>
+					<div class="container" data-markdown>
+						* Dependencies are defined explicitly
+						* We don't create dependencies between kernel functions but we do create dependencies on the data movement
+					</div>
+				</section>
+				<!--Slide 17-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Concurrent data flow with USM
+					</div>
+					<div class="container">
+						<pre class="cpp"><code class="code-100pc" data-line-numbers="5,10,14,17">auto devPtrA = sycl::malloc_device&lt;int&gt;(1, q);
+auto devPtrB = sycl::malloc_device&lt;int&gt;(1, q);
+
+auto e1 = q.memcpy(devPtrA, dataA, sizeof(int));
+auto e2 = q.memcpy(devPtrB, dataB, sizeof(int));
+
+auto e3 = q.single_task(e1,
+    [=]() { *devPtrA = /* some computation */ });
+
+auto e4 = q.single_task(e2,
+	[=]() { *devPtrB = /* some computation */ });
+
+auto e5 = q.memcpy(dataA, devPtrA, sizeof(int), e3);
+auto e6 = q.memcpy(dataB, devPtrB, sizeof(int), e4);
+
+e5.wait();
+e6.wait();
+
+sycl::free(devPtrA, q);
+sycl::free(devPtrB, q);</code></pre>
+					</div>
+					<div class="container" data-markdown>
+						* The dependencies of each chain of commands is independent of the other
+						* The two kernels and their respective copies collectively can be executed in any order
+					</div>
+				</section>
+				<section>
+					<div class="hbox" data-markdown>
+						## Questions
+					</div>
+				</section>
+				<!--Slide 21-->
+				<!-- <section>
+					<div class="hbox" data-markdown>
+						#### Exercise
+					</div>
+					<div class="container" data-markdown>
+						Code_Exercises/Section_2_Managing_Data/source
+					</div>
+					<div class="container" data-markdown>
+						Implement a SYCL application that adds two variables
+						and returns the result.  
+						Use USM to manage memory.
+					</div>
+				</section> -->
+				<!--Slide 17-->
+				<section>
+					<div class="hbox" data-markdown>
+						#### Exercise
+					</div>
+					<div class="container" data-markdown>
+						Code_Exercises/Section_2_Managing_Data/source
+					</div>
+					<div class="container" data-markdown>
+						![SYCL](../common-revealjs/images/diamond_data_flow.png "SYCL")
+					</div>
+					<div class="container" data-markdown>
+						Put together what you've seen here to create the above diamond data flow graph.
+					</div>
+				</section>
+			</div>
+		</div>
+		<script src="../common-revealjs/js/reveal.js"></script>
+		<script src="../common-revealjs/plugin/markdown/marked.js"></script>
+		<script src="../common-revealjs/plugin/markdown/markdown.js"></script>
+		<script src="../common-revealjs/plugin/notes/notes.js"></script>
+		<script>
+			Reveal.initialize({
+				dependencies: [{src: '../common-revealjs/plugin/highlight/highlight.js', async: true}]
+			});
+			Reveal.configure({ slideNumber: true });
+		</script>
+	</body>
+</html>
