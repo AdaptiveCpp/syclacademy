@@ -34,11 +34,15 @@
  * sycl::free(ptr, q);
  *
  * // Submit a single task kernel
- * q.single_task([=](){
+ * auto event = q.single_task([=](){
  *      // Some kernel code
- *   }).wait();
+ *   });
+ * // Submit a single task kernel that is executed after another event
+ * auto event = q.single_task(event_to_wait_for, [=](){
+ *      // Some kernel code
+ *   });
  *
-*/
+ */
 
 #include "../helpers.hpp"
 
