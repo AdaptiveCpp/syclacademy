@@ -45,10 +45,10 @@ endfunction()
 
 
 
-add_subdirectory(Section_1_What_is_SYCL)
-add_subdirectory(Section_2_Managing_Data)
-add_subdirectory(Section_3_Device_Discovery)
-add_subdirectory(Section_4_ND_Range_Kernel)
+add_subdirectory(Section_1_What_is_SYCL/What_is_SYCL)
+add_subdirectory(Section_2_Managing_Data/Managing_Data)
+add_subdirectory(Section_3_Device_Discovery/Device_Discovery)
+add_subdirectory(Section_4_ND_Range_Kernel/ND_Range_Kernel)
 add_subdirectory(Section_5_Image_Convolution)
 add_subdirectory(Section_6_Coalesced_Global_Memory)
 add_subdirectory(Section_7_Local_Memory_Tiling)
