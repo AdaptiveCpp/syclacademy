@@ -41,7 +41,7 @@ int main() {
     );
 
   // Kernel C:
-  auto eKC = defaultQueue.single_task({eKB, eDC},
+  auto eKC = defaultQueue.single_task({eKA, eDC},
       [=] {
         *dev_C = *dev_C - *dev_A;
       }
