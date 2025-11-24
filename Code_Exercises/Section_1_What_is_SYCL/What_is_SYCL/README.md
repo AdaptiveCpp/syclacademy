@@ -16,9 +16,9 @@ For MOGON NHR, open: mod.hpc.uni-mainz.de
 Login using the provided credentials.
 Open "Code Server".
 Start a new session:
-- Use `ki-heprosycl` as account
+- Use `ki-hpckurs` as account
 - Use `A40` as partition
-- Number of hours: `9`
+- Number of hours: `4`
 - Number of Tasks: `1`
 - CPUs per Task: `8`
 - Memory: `32`
@@ -29,7 +29,7 @@ Start with:
 - CTRL+ALT+P: "Create New Terminal"
 ```
 module load tools/Apptainer
-apptainer run --nv /lustre/project/ki-heprosycl/cuda-devel.sif
+apptainer run --nv /lustre/project/ki-hpckurs/cuda-devel.sif
 ```
 Now you're in the apptainer environment that we'll use for today.
 It provides all the dependencies we'll need today (LLVM, Boost, CMake, Ninja, git, ..)
