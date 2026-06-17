@@ -21,7 +21,7 @@
 #include <sycl/sycl.hpp>
 
 inline constexpr util::filter_type filterType = util::filter_type::blur;
-inline constexpr int filterWidth = 11;
+inline constexpr int filterWidth = 3;
 inline constexpr int halo = filterWidth / 2;
 
 int main() {
@@ -120,8 +120,8 @@ int main() {
     auto outDev = sycl::malloc_device<sycl::mfloat4>(outBufRange.size(), myQueue);
     auto filterDev = sycl::malloc_device<sycl::mfloat4>(filterRange.size(), myQueue);
 
-    myQueue.copy<sycl::mfloat4>(inputImage.data(), inDev, inBufRange.size());
-    myQueue.copy<sycl::mfloat4>(filter.data(), filterDev, filterRange.size());
+    myQueue.copy<sycl::mfloat4>(reinterpret_cast<sycl::mfloat4*>(inputImage.data()), inDev, inBufRange.size());
+    myQueue.copy<sycl::mfloat4>(reinterpret_cast<sycl::mfloat4*>(filter.data()), filterDev, filterRange.size());
 
     // synchronize before benchmark, to not measure data transfers.
     myQueue.wait_and_throw();
@@ -143,7 +143,7 @@ int main() {
                                           src[1] + ((c - halo)));
                 auto filterOffset = sycl::id(r, c);
 
-                  sum[i] += inDev[srcOffset[0] * inBufRange[1] + srcOffset[1]] *
+                  sum += inDev[srcOffset[0] * inBufRange[1] + srcOffset[1]] *
                             filterDev[filterOffset[0] * filterRange[1] +
                                       filterOffset[1]];
               }
@@ -154,8 +154,8 @@ int main() {
 
           myQueue.wait_and_throw();
         },
-        100, "image convolution (coalesced)");
-    myQueue.copy<sycl::mfloat4>(outDev, outputImage.data(), outBufRange.size())
+        100, "image convolution (coalesced & mfloat4)");
+    myQueue.copy<sycl::mfloat4>(outDev, reinterpret_cast<sycl::mfloat4*>(outputImage.data()), outBufRange.size())
         .wait_and_throw();
 #endif
   } catch (const sycl::exception& e) {
