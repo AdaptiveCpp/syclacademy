@@ -18,7 +18,7 @@ Open "Code Server".
 Start a new session:
 - Use `ki-heprosycl` as account
 - Use `A40` as partition
-- Number of hours: `9`
+- Number of hours: `8`
 - Number of Tasks: `1`
 - CPUs per Task: `8`
 - Memory: `32`
@@ -42,6 +42,7 @@ mkdir build
 cd build
 cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/install
 ninja install
+export PATH="$HOME/install/bin/:$PATH"
 ```
 
 Now, you have AdaptiveCpp installed.
@@ -91,7 +92,7 @@ Then open the source file for this exercise and include the SYCL header file
 Make sure before you do this you define `SYCL_LANGUAGE_VERSION` to `2020`, to
 enable support for the SYCL 2020 interface.
 
-Once that is done build your source file with your chosen build system.
+Once that is done build your source file with your chosen build system (see below).
 
 ### 5.) Compile and run
 
@@ -101,19 +102,20 @@ and invoke the executable.
 #### Build And Execution Hints
 
 ```sh
-# <target specification> is a list of backends and devices to target, for example
+# ACPP_TARGETS / acpp-targets is a list of backends and devices to target, for example
 # "generic" compiles for CPUs and GPUs using the generic single-pass compiler.
 # When in doubt, use "generic" as it usually generates the fastest binaries.
 #
 # Recent, full installations of AdaptiveCpp may not need targets to be provided,
 # compiling for "generic" by default.
-cmake -GNinja -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=~/install -DACPP_TARGETS="<target specification>" ..
+cmake -GNinja -DSYCL_ACADEMY_USE_ADAPTIVECPP=ON -DSYCL_ACADEMY_INSTALL_ROOT=~/install -DACPP_TARGETS="generic" ..
 ninja What_is_SYCL_source
+./Code_Exercises/Section_1_What_is_SYCL/What_is_SYCL/What_is_SYCL_source
 ```
 alternatively, without CMake:
 ```sh
 cd Code_Exercises/What_is_SYCL
-~/install/bin/acpp -o What_is_SYCL_source --acpp-targets="<target specification>" source.cpp
+~/install/bin/acpp -o What_is_SYCL_source --acpp-targets="generic" source.cpp
 ./What_is_SYCL_source
 ```
 
